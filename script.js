@@ -1,7 +1,7 @@
 // Translations
 const translations = {
     en: {
-        welcomeTitle: "Welcome to Eco Fashion Game",
+        welcomeTitle: "Welcome to Dress Up Gaame",
         welcomeText: "Dress your character!",
         startGame: "Start Game",
         categoryAccessories: "Accessories",
@@ -74,7 +74,7 @@ const translations = {
         shoesNames: ['Sneakers', 'Boots', 'Sandals', 'Loafers', 'Flats', 'Heels', 'Oxfords', 'Slippers', 'Mules', 'Espadrilles']
     },
     tr: {
-        welcomeTitle: "Eko Moda Oyununa Hoş Geldiniz",
+        welcomeTitle: "Dress Up Gaame oyununa hoş geldiniz",
         welcomeText: "Karakterinizi istediğiniz gibi giydirin!",
         startGame: "Oyuna Başla",
         categoryAccessories: "Aksesuarlar",
