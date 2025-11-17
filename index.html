@@ -28,23 +28,7 @@
     <!-- Homepage Screen -->
     <div id="homepage" class="screen">
         <div class="character-container">
-            <svg class="character" viewBox="0 0 200 400" width="200" height="400">
-                <!-- Head -->
-                <circle cx="100" cy="60" r="30" fill="none" stroke="#333" stroke-width="3"/>
-                <!-- Eyes -->
-                <circle cx="90" cy="55" r="3" fill="#333"/>
-                <circle cx="110" cy="55" r="3" fill="#333"/>
-                <!-- Smile -->
-                <path d="M 85 65 Q 100 75 115 65" fill="none" stroke="#333" stroke-width="2"/>
-                <!-- Body -->
-                <line x1="100" y1="90" x2="100" y2="200" stroke="#333" stroke-width="3"/>
-                <!-- Arms -->
-                <line x1="100" y1="120" x2="70" y2="150" stroke="#333" stroke-width="3"/>
-                <line x1="100" y1="120" x2="130" y2="150" stroke="#333" stroke-width="3"/>
-                <!-- Legs -->
-                <line x1="100" y1="200" x2="75" y2="280" stroke="#333" stroke-width="3"/>
-                <line x1="100" y1="200" x2="125" y2="280" stroke="#333" stroke-width="3"/>
-            </svg>
+            <img src="avatar.png" alt="Avatar" class="character hero-avatar">
         </div>
         <h2 class="welcome-title" data-i18n="welcomeTitle">Welcome to Eco Fashion Game</h2>
         <p class="welcome-text" data-i18n="welcomeText">Dress up and discover your environmental impact!</p>
@@ -56,7 +40,6 @@
         <div class="game-layout">
             <!-- Categories -->
             <div class="categories">
-                <button class="category-btn active" data-category="accessories" data-i18n="categoryAccessories">Accessories</button>
                 <button class="category-btn" data-category="outerwear" data-i18n="categoryOuterwear">Outerwear</button>
                 <button class="category-btn" data-category="bottoms" data-i18n="categoryBottoms">Bottoms</button>
                 <button class="category-btn" data-category="shoes" data-i18n="categoryShoes">Shoes</button>
@@ -84,31 +67,14 @@
             <!-- Character Preview -->
             <div class="preview-container">
                 <h3 data-i18n="yourOutfit">Your Outfit</h3>
-                <svg class="character preview-character" viewBox="0 0 200 400" width="200" height="400">
-                    <!-- Head -->
-                    <circle cx="100" cy="60" r="30" fill="none" stroke="#333" stroke-width="3"/>
-                    <!-- Eyes -->
-                    <circle cx="90" cy="55" r="3" fill="#333"/>
-                    <circle cx="110" cy="55" r="3" fill="#333"/>
-                    <!-- Smile -->
-                    <path d="M 85 65 Q 100 75 115 65" fill="none" stroke="#333" stroke-width="2"/>
-                    <!-- Body -->
-                    <line x1="100" y1="90" x2="100" y2="200" stroke="#333" stroke-width="3"/>
-                    <!-- Arms -->
-                    <line x1="100" y1="120" x2="70" y2="150" stroke="#333" stroke-width="3"/>
-                    <line x1="100" y1="120" x2="130" y2="150" stroke="#333" stroke-width="3"/>
-                    <!-- Legs -->
-                    <line x1="100" y1="200" x2="75" y2="280" stroke="#333" stroke-width="3"/>
-                    <line x1="100" y1="200" x2="125" y2="280" stroke="#333" stroke-width="3"/>
-
+                <svg class="character preview-character" viewBox="0 0 200 400" width="200" height="400" preserveAspectRatio="xMidYMid meet">
+                    <image href="avatar.png" x="0" y="0" width="200" height="400" />
                     <!-- Clothing layers (will be populated by JS) -->
-                    <g id="preview-accessories"></g>
                     <g id="preview-outerwear"></g>
                     <g id="preview-bottoms"></g>
                     <g id="preview-shoes"></g>
                 </svg>
                 <div class="selected-items">
-                    <p><strong data-i18n="categoryAccessories">Accessories:</strong> <span id="selected-accessories" data-i18n="none">None</span></p>
                     <p><strong data-i18n="categoryOuterwear">Outerwear:</strong> <span id="selected-outerwear" data-i18n="none">None</span></p>
                     <p><strong data-i18n="categoryBottoms">Bottoms:</strong> <span id="selected-bottoms" data-i18n="none">None</span></p>
                     <p><strong data-i18n="categoryShoes">Shoes:</strong> <span id="selected-shoes" data-i18n="none">None</span></p>
@@ -117,9 +83,9 @@
                 </div>
                 <div class="preview-primary-actions">
                     <div class="preview-secondary-group">
-                        <button id="undoBtn" class="btn-secondary" data-i18n="undo" title="Undo">
-                            ↩️
-                        </button>
+                    <button id="undoBtn" class="btn-secondary" data-i18n="undo" title="Undo">
+                        ↩️
+                    </button>
                         <button id="resetOutfitBtn" class="btn-secondary" data-i18n="resetOutfit" title="Reset Outfit">
                             ♻️
                         </button>
@@ -134,39 +100,39 @@
     <div id="scoreScreen" class="screen">
         <div class="score-container">
             <div class="score-section">
-                <div id="initialScore" class="score-display active">
-                    <h1 data-i18n="score">SCORE</h1>
-                    <div class="score-number">*********</div>
-                </div>
+            <div id="initialScore" class="score-display active">
+                <h1 data-i18n="score">SCORE</h1>
+                <div class="score-number">*********</div>
+            </div>
             </div>
             <div class="impact-section hidden">
-                <div id="impactScreen" class="impact-display">
-                    <h1 data-i18n="environmentalImpact">Environmental Impact</h1>
-                    <div class="impact-stats">
-                        <div class="stat-item">
-                            <h2 id="waterSaved">0</h2>
-                            <p data-i18n="waterSaved">Liters of water saved</p>
-                        </div>
-                        <div class="stat-item">
-                            <h2 id="co2Reduced">0</h2>
-                            <p data-i18n="co2Reduced">kg of CO2 emissions prevented</p>
-                        </div>
-                        <div class="stat-item">
-                            <h2 id="wasteReduced">0</h2>
-                            <p data-i18n="wasteReduced">kg of textile waste avoided</p>
-                        </div>
-                        <div class="stat-item eco-rating">
-                            <h2 id="ecoRating">-</h2>
-                            <p data-i18n="yourEcoRating">Your Eco Rating</p>
-                        </div>
+            <div id="impactScreen" class="impact-display">
+                <h1 data-i18n="environmentalImpact">Environmental Impact</h1>
+                <div class="impact-stats">
+                    <div class="stat-item">
+                        <h2 id="waterSaved">0</h2>
+                        <p data-i18n="waterSaved">Liters of water saved</p>
                     </div>
-                    <div class="impact-message">
-                        <p id="impactText"></p>
+                    <div class="stat-item">
+                        <h2 id="co2Reduced">0</h2>
+                        <p data-i18n="co2Reduced">kg of CO2 emissions prevented</p>
                     </div>
-                    <div class="sustainability-facts">
-                        <h3 data-i18n="didYouKnow">💡 Did You Know?</h3>
-                        <p id="sustainabilityFact"></p>
+                    <div class="stat-item">
+                        <h2 id="wasteReduced">0</h2>
+                        <p data-i18n="wasteReduced">kg of textile waste avoided</p>
                     </div>
+                    <div class="stat-item eco-rating">
+                        <h2 id="ecoRating">-</h2>
+                        <p data-i18n="yourEcoRating">Your Eco Rating</p>
+                    </div>
+                </div>
+                <div class="impact-message">
+                    <p id="impactText"></p>
+                </div>
+                <div class="sustainability-facts">
+                    <h3 data-i18n="didYouKnow">💡 Did You Know?</h3>
+                    <p id="sustainabilityFact"></p>
+                </div>
                 </div>
             </div>
             <div class="score-actions">

@@ -68,7 +68,6 @@ const translations = {
         impactMessageC: "Good job! You made some eco-conscious decisions. Every sustainable choice makes a difference for our planet.",
         impactMessageD: "Not bad! Consider choosing more secondhand or eco-friendly items next time to increase your positive impact.",
         impactMessageF: "There is room for improvement. Try choosing secondhand or eco-friendly items to reduce your environmental footprint!",
-        accessoryNames: ['Hat', 'Scarf', 'Belt', 'Bag', 'Sunglasses', 'Watch', 'Bracelet', 'Necklace', 'Earrings', 'Ring'],
         outerwearNames: ['Jacket', 'Coat', 'Hoodie', 'Cardigan', 'Blazer', 'Sweater', 'Vest', 'Windbreaker', 'Parka', 'Poncho'],
         bottomsNames: ['Jeans', 'Pants', 'Shorts', 'Skirt', 'Leggings', 'Trousers', 'Joggers', 'Culottes', 'Chinos', 'Cargo Pants'],
         shoesNames: ['Sneakers', 'Boots', 'Sandals', 'Loafers', 'Flats', 'Heels', 'Oxfords', 'Slippers', 'Mules', 'Espadrilles']
@@ -141,7 +140,6 @@ const translations = {
         impactMessageC: "Aferin! Çevre bilinçli kararlar aldınız. Her sürdürülebilir seçim gezegenimiz için fark yaratır.",
         impactMessageD: "Fena değil! Bir dahaki sefere daha fazla ikinci el veya sürdürülebilir ürün seçerek olumlu etkilerinizi artırabilirsiniz.",
         impactMessageF: "Gelişme için alan var. Çevresel ayak izinizi azaltmak için ikinci el veya sürdürülebilir ürünler seçmeyi deneyin!",
-        accessoryNames: ['Şapka', 'Atkı', 'Kemer', 'Çanta', 'Güneş Gözlüğü', 'Saat', 'Bilezik', 'Kolye', 'Küpe', 'Yüzük'],
         outerwearNames: ['Ceket', 'Palto', 'Kapşonlu', 'Hırka', 'Blazer', 'Kazak', 'Yelek', 'Rüzgarlık', 'Parka', 'Ponço'],
         bottomsNames: ['Kot Pantolon', 'Pantolon', 'Şort', 'Etek', 'Tayt', 'Kumaş Pantolon', 'Eşofman', 'Bol Pantolon', 'Chino', 'Kargo'],
         shoesNames: ['Spor Ayakkabı', 'Bot', 'Sandalet', 'Loafer', 'Babet', 'Topuklu', 'Oxford', 'Terlik', 'Mule', 'Espadril']
@@ -152,10 +150,9 @@ const translations = {
 let currentLanguage = 'en';
 
 const gameState = {
-    currentCategory: 'accessories',
+    currentCategory: 'outerwear',
     currentIndex: 0,
     selectedItems: {
-        accessories: null,
         outerwear: null,
         bottoms: null,
         shoes: null
@@ -208,11 +205,10 @@ function translateUI() {
 
 // Generate random clothing items
 function generateClothingItems() {
-    const categories = ['accessories', 'outerwear', 'bottoms', 'shoes'];
+    const categories = ['outerwear', 'bottoms', 'shoes'];
     const items = {};
 
     const namesByCategory = {
-        accessories: translations[currentLanguage].accessoryNames,
         outerwear: translations[currentLanguage].outerwearNames,
         bottoms: translations[currentLanguage].bottomsNames,
         shoes: translations[currentLanguage].shoesNames
@@ -223,48 +219,80 @@ function generateClothingItems() {
     const brandOptions = translations[currentLanguage].brandNames;
 
     const emojis = {
-        accessories: ['🎩', '🧢', '👒', '🎓', '🧣', '👝', '🎒', '👜', '🕶️', '⌚', '📿', '💍'],
         outerwear: ['🧥', '🥼', '🦺', '👔', '🥻', '👕', '👚', '🩱'],
         bottoms: ['👖', '👗', '🩳', '👘', '🩱'],
         shoes: ['👟', '👞', '👠', '👡', '🥾', '🥿', '👢']
     };
 
     const priceRanges = {
-        accessories: { min: 30, max: 160 },
         outerwear: { min: 150, max: 420 },
         bottoms: { min: 80, max: 260 },
         shoes: { min: 100, max: 320 }
     };
 
+    const typeKeys = Object.keys(clothingTypes);
+
     categories.forEach(category => {
         items[category] = [];
-        const names = namesByCategory[category];
-        const categoryEmojis = emojis[category];
+        const names = namesByCategory[category] || [];
+        const categoryEmojis = emojis[category] || [];
         const range = priceRanges[category];
 
-        for (let i = 0; i < 30; i++) {
-            const typeKeys = Object.keys(clothingTypes);
+        const createRandomItem = (index = 0, overrides = {}) => {
             const randomType = clothingTypes[typeKeys[Math.floor(Math.random() * typeKeys.length)]];
-            const baseName = names[i % names.length];
-            const nameVariant = i < names.length ? baseName : `${baseName} ${Math.floor(i / names.length) + 1}`;
-            const emoji = categoryEmojis[i % categoryEmojis.length];
+            const baseName = names.length ? names[index % names.length] : `${category} ${index + 1}`;
+            const nameVariant = index < names.length
+                ? baseName
+                : `${baseName} ${Math.floor(index / (names.length || 1)) + 1}`;
+            const emoji = categoryEmojis.length ? categoryEmojis[index % categoryEmojis.length] : '👚';
             const price = range
                 ? Math.round((Math.random() * (range.max - range.min) + range.min) / 10) * 10
                 : Math.round(Math.random() * 100) * 10;
-            const condition = getRandomFromArray(conditionOptions);
-            const material = getRandomFromArray(materialOptions);
-            const brand = getRandomFromArray(brandOptions);
-
-            items[category].push({
-                id: i,
+            const baseItem = {
+                id: `${category}-${index}`,
                 name: nameVariant,
                 type: randomType,
                 emoji: emoji,
                 price: price,
-                condition: condition,
-                material: material,
-                brand: brand
-            });
+                condition: getRandomFromArray(conditionOptions),
+                material: getRandomFromArray(materialOptions),
+                brand: getRandomFromArray(brandOptions),
+                image: null,
+                previewTransform: null
+            };
+            return { ...baseItem, ...overrides };
+        };
+
+        if (category === 'outerwear') {
+            const curatedOuterwear = [];
+            const localizedTopName = currentLanguage === 'tr' ? 'Top 1' : 'Top 1';
+            const averageOuterwearPrice = range
+                ? Math.round(((range.min + range.max) / 2) / 10) * 10
+                : 200;
+
+            curatedOuterwear.push(createRandomItem(0, {
+                id: 'outerwear-top1',
+                name: localizedTopName,
+                type: clothingTypes.ECO_FRIENDLY,
+                emoji: '👚',
+                image: 'top1.png',
+                price: averageOuterwearPrice,
+                condition: currentLanguage === 'tr'
+                    ? (conditionOptions.find(option => option.toLowerCase().includes('yeni')) || conditionOptions[0] || '-')
+                    : (conditionOptions.find(option => option.toLowerCase().includes('like new')) || conditionOptions[0] || '-'),
+                material: materialOptions[0] || '-',
+                brand: brandOptions[0] || '-',
+                previewTransform: { x: 0, y: 63, width: 200, height: 270 }
+            }));
+
+            curatedOuterwear.push(createRandomItem(1, { id: 'outerwear-classic' }));
+
+            items[category] = curatedOuterwear;
+            return;
+        }
+
+        for (let i = 0; i < 30; i++) {
+            items[category].push(createRandomItem(i));
         }
     });
 
@@ -315,7 +343,13 @@ function updateClothingDisplay() {
     const items = clothingData[gameState.currentCategory];
     const currentItem = items[gameState.currentIndex];
 
-    itemDisplay.placeholder.textContent = currentItem.emoji;
+    if (currentItem.image) {
+        itemDisplay.placeholder.innerHTML = `<img src="${currentItem.image}" alt="${currentItem.name}" class="item-image">`;
+        itemDisplay.placeholder.classList.add('has-image');
+    } else {
+        itemDisplay.placeholder.textContent = currentItem.emoji || '';
+        itemDisplay.placeholder.classList.remove('has-image');
+    }
     itemDisplay.name.textContent = currentItem.name;
     if (itemDisplay.details) {
         if (itemDisplay.details.price) {
@@ -386,7 +420,6 @@ function createParticles(x, y, color = '#f88cac') {
 // Update Character Preview
 function updateCharacterPreview() {
     const selectedItemsDisplay = {
-        accessories: document.getElementById('selected-accessories'),
         outerwear: document.getElementById('selected-outerwear'),
         bottoms: document.getElementById('selected-bottoms'),
         shoes: document.getElementById('selected-shoes')
@@ -412,12 +445,11 @@ function updateCharacterPreview() {
 
 // Update Preview Character Visuals
 function updatePreviewCharacterVisuals() {
-    const previewLayers = {
-        accessories: document.getElementById('preview-accessories'),
-        outerwear: document.getElementById('preview-outerwear'),
-        bottoms: document.getElementById('preview-bottoms'),
-        shoes: document.getElementById('preview-shoes')
-    };
+const previewLayers = {
+    outerwear: document.getElementById('preview-outerwear'),
+    bottoms: document.getElementById('preview-bottoms'),
+    shoes: document.getElementById('preview-shoes')
+};
 
     // Clear all layers
     Object.values(previewLayers).forEach(layer => {
@@ -425,24 +457,27 @@ function updatePreviewCharacterVisuals() {
     });
 
     // Add visual indicators for selected items
-    if (gameState.selectedItems.accessories) {
-        const item = gameState.selectedItems.accessories;
-        const color = getColorForType(item.type);
-        // Add a hat/accessory on head
-        previewLayers.accessories.innerHTML = `
-            <circle cx="100" cy="40" r="35" fill="${color}" opacity="0.7"/>
-            <text x="100" y="48" text-anchor="middle" font-size="24">${item.emoji}</text>
-        `;
-    }
-
     if (gameState.selectedItems.outerwear) {
         const item = gameState.selectedItems.outerwear;
-        const color = getColorForType(item.type);
-        // Add outerwear on torso
-        previewLayers.outerwear.innerHTML = `
-            <rect x="70" y="90" width="60" height="80" fill="${color}" opacity="0.7" rx="5"/>
-            <text x="100" y="140" text-anchor="middle" font-size="24">${item.emoji}</text>
-        `;
+        if (item.image) {
+            const transform = item.previewTransform || { x: 60, y: 80, width: 80, height: 120 };
+            previewLayers.outerwear.innerHTML = `
+                <image href="${item.image}"
+                    x="${transform.x}"
+                    y="${transform.y}"
+                    width="${transform.width}"
+                    height="${transform.height}"
+                    preserveAspectRatio="xMidYMid meet"
+                    class="preview-item-image" />
+            `;
+        } else {
+            const color = getColorForType(item.type);
+            // Add outerwear on torso
+            previewLayers.outerwear.innerHTML = `
+                <rect x="70" y="90" width="60" height="80" fill="${color}" opacity="0.7" rx="5"/>
+                <text x="100" y="140" text-anchor="middle" font-size="24">${item.emoji}</text>
+            `;
+        }
     }
 
     if (gameState.selectedItems.bottoms) {
