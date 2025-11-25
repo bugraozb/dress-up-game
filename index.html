@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dress Up Gaame</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="src/css/style.css">
 </head>
+
 <body>
     <!-- Language Selection Screen -->
     <div id="languageScreen" class="screen active">
@@ -18,7 +20,7 @@
                     <span class="lang-name">English</span>
                 </button>
                 <button class="language-btn" data-lang="tr">
-                    <span class="flag">🇹🇷</span>
+                    <span class="flag">TR</span>
                     <span class="lang-name">Türkçe</span>
                 </button>
             </div>
@@ -28,7 +30,7 @@
     <!-- Homepage Screen -->
     <div id="homepage" class="screen">
         <div class="character-container">
-            <img src="avatar.png" alt="Avatar" class="character hero-avatar">
+            <img src="assets/images/avatar/avatar.png" alt="Avatar" class="character hero-avatar">
         </div>
         <h2 class="welcome-title" data-i18n="welcomeTitle">Welcome to Eco Fashion Game</h2>
         <p class="welcome-text" data-i18n="welcomeText">Dress up and discover your environmental impact!</p>
@@ -40,9 +42,15 @@
         <div class="game-layout">
             <!-- Categories -->
             <div class="categories">
-                <button class="category-btn" data-category="outerwear" data-i18n="categoryOuterwear">Outerwear</button>
-                <button class="category-btn" data-category="bottoms" data-i18n="categoryBottoms">Bottoms</button>
-                <button class="category-btn" data-category="shoes" data-i18n="categoryShoes">Shoes</button>
+                <button class="category-btn" data-category="outerwear" title="Üst Giyim">
+                    <img src="assets/images/icons/top_icon.png" alt="Üst Giyim" class="category-icon">
+                </button>
+                <button class="category-btn" data-category="bottoms" title="Alt Giyim">
+                    <img src="assets/images/icons/bottom_icon.png" alt="Alt Giyim" class="category-icon">
+                </button>
+                <button class="category-btn" data-category="shoes" title="Ayakkabı">
+                    <img src="assets/images/icons/shoes_icon.png" alt="Ayakkabı" class="category-icon">
+                </button>
             </div>
 
             <!-- Clothing Carousel -->
@@ -53,10 +61,14 @@
                         <div class="item-placeholder"></div>
                         <h3 class="item-name"></h3>
                         <div class="item-details">
-                            <p><strong data-i18n="priceLabel">Price:</strong> <span class="item-detail-value" data-detail="price">-</span></p>
-                            <p><strong data-i18n="conditionLabel">Condition:</strong> <span class="item-detail-value" data-detail="condition">-</span></p>
-                            <p><strong data-i18n="materialLabel">Material:</strong> <span class="item-detail-value" data-detail="material">-</span></p>
-                            <p><strong data-i18n="brandLabel">Brand:</strong> <span class="item-detail-value" data-detail="brand">-</span></p>
+                            <p><strong data-i18n="priceLabel">Price:</strong> <span class="item-detail-value"
+                                    data-detail="price">-</span></p>
+                            <p><strong data-i18n="conditionLabel">Condition:</strong> <span class="item-detail-value"
+                                    data-detail="condition">-</span></p>
+                            <p><strong data-i18n="materialLabel">Material:</strong> <span class="item-detail-value"
+                                    data-detail="material">-</span></p>
+                            <p><strong data-i18n="brandLabel">Brand:</strong> <span class="item-detail-value"
+                                    data-detail="brand">-</span></p>
                         </div>
                         <button class="select-btn" data-i18n="select">Select</button>
                     </div>
@@ -67,25 +79,43 @@
             <!-- Character Preview -->
             <div class="preview-container">
                 <h3 data-i18n="yourOutfit">Your Outfit</h3>
-                <svg class="character preview-character" viewBox="0 0 200 400" width="200" height="400" preserveAspectRatio="xMidYMid meet">
-                    <image href="avatar.png" x="0" y="0" width="200" height="400" />
+        <svg class="character preview-character" viewBox="0 0 200 400" width="400" height="800"
+                    preserveAspectRatio="xMidYMid meet">
+                    <image href="assets/images/avatar/avatar.png" x="0" y="0" width="200" height="400" />
                     <!-- Clothing layers (will be populated by JS) -->
                     <g id="preview-outerwear"></g>
                     <g id="preview-bottoms"></g>
                     <g id="preview-shoes"></g>
                 </svg>
                 <div class="selected-items">
-                    <p><strong data-i18n="categoryOuterwear">Outerwear:</strong> <span id="selected-outerwear" data-i18n="none">None</span></p>
-                    <p><strong data-i18n="categoryBottoms">Bottoms:</strong> <span id="selected-bottoms" data-i18n="none">None</span></p>
-                    <p><strong data-i18n="categoryShoes">Shoes:</strong> <span id="selected-shoes" data-i18n="none">None</span></p>
+                    <p><strong data-i18n="categoryOuterwear">Outerwear:</strong> <span id="selected-outerwear"
+                            data-i18n="none">None</span></p>
+                    <p><strong data-i18n="categoryBottoms">Bottoms:</strong> <span id="selected-bottoms"
+                            data-i18n="none">None</span></p>
+                    <p><strong data-i18n="categoryShoes">Shoes:</strong> <span id="selected-shoes"
+                            data-i18n="none">None</span></p>
                 </div>
                 <div class="preview-actions">
                 </div>
                 <div class="preview-primary-actions">
+                    <div class="budget-panel">
+                        <div class="budget-row budget-total">
+                            <span data-i18n="budgetLabel">Budget</span>
+                            <span id="budgetTotal">🪙 0</span>
+                        </div>
+                        <div class="budget-row budget-spent">
+                            <span data-i18n="budgetSpent">Spent</span>
+                            <span id="budgetSpent">🪙 0</span>
+                        </div>
+                        <div class="budget-row budget-remaining">
+                            <span data-i18n="budgetRemaining">Remaining</span>
+                            <span id="budgetRemaining">🪙 0</span>
+                        </div>
+                    </div>
                     <div class="preview-secondary-group">
-                    <button id="undoBtn" class="btn-secondary" data-i18n="undo" title="Undo">
-                        ↩️
-                    </button>
+                        <button id="undoBtn" class="btn-secondary" data-i18n="undo" title="Undo">
+                            ↩️
+                        </button>
                         <button id="resetOutfitBtn" class="btn-secondary" data-i18n="resetOutfit" title="Reset Outfit">
                             ♻️
                         </button>
@@ -100,39 +130,48 @@
     <div id="scoreScreen" class="screen">
         <div class="score-container">
             <div class="score-section">
-            <div id="initialScore" class="score-display active">
-                <h1 data-i18n="score">SCORE</h1>
-                <div class="score-number">*********</div>
-            </div>
+                <div id="initialScore" class="score-display active">
+                    <h1 data-i18n="score">SCORE</h1>
+                    <div class="score-number">*********</div>
+                </div>
             </div>
             <div class="impact-section hidden">
-            <div id="impactScreen" class="impact-display">
-                <h1 data-i18n="environmentalImpact">Environmental Impact</h1>
-                <div class="impact-stats">
-                    <div class="stat-item">
-                        <h2 id="waterSaved">0</h2>
-                        <p data-i18n="waterSaved">Liters of water saved</p>
+                <div id="impactScreen" class="impact-display">
+                    <h1 data-i18n="environmentalImpact">Environmental Impact</h1>
+                    <div class="impact-stats">
+                        <div class="stat-item">
+                            <h2 id="waterUsed">0</h2>
+                            <p data-i18n="waterUsed">Liters of water used</p>
+                        </div>
+                        <div class="stat-item">
+                            <h2 id="co2Emitted">0</h2>
+                            <p data-i18n="co2Emitted">kg of CO2 emissions</p>
+                        </div>
+                        <div class="stat-item">
+                            <h2 id="energyUsed">0</h2>
+                            <p data-i18n="energyUsed">kWh of energy used</p>
+                        </div>
+                        <div class="stat-item eco-rating">
+                            <h2 id="ecoRating">-</h2>
+                            <p data-i18n="yourEcoRating">Your Eco Rating</p>
+                        </div>
                     </div>
-                    <div class="stat-item">
-                        <h2 id="co2Reduced">0</h2>
-                        <p data-i18n="co2Reduced">kg of CO2 emissions prevented</p>
+                    <div class="impact-message">
+                        <p id="impactText"></p>
                     </div>
-                    <div class="stat-item">
-                        <h2 id="wasteReduced">0</h2>
-                        <p data-i18n="wasteReduced">kg of textile waste avoided</p>
+                    <div class="sustainability-facts">
+                        <h3 data-i18n="didYouKnow">💡 Did You Know?</h3>
+                        <p id="sustainabilityFact"></p>
                     </div>
-                    <div class="stat-item eco-rating">
-                        <h2 id="ecoRating">-</h2>
-                        <p data-i18n="yourEcoRating">Your Eco Rating</p>
+                    <div class="session-history">
+                        <div class="history-header">
+                            <h3 data-i18n="recentOutfits">Recent Outfits</h3>
+                            <button id="exportHistoryBtn" class="btn-secondary history-export" data-i18n="exportHistory">
+                                Export History
+                            </button>
+                        </div>
+                        <ul id="sessionHistoryList" class="history-list"></ul>
                     </div>
-                </div>
-                <div class="impact-message">
-                    <p id="impactText"></p>
-                </div>
-                <div class="sustainability-facts">
-                    <h3 data-i18n="didYouKnow">💡 Did You Know?</h3>
-                    <p id="sustainabilityFact"></p>
-                </div>
                 </div>
             </div>
             <div class="score-actions">
@@ -141,6 +180,7 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="src/js/script.js"></script>
 </body>
+
 </html>
