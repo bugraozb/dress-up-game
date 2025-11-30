@@ -77,6 +77,10 @@ body {
     align-items: center;
 }
 
+button {
+    touch-action: manipulation;
+}
+
 /* Language Selection Screen */
 #languageScreen {
     text-align: center;
@@ -1159,10 +1163,15 @@ body {
 
 @media (max-width: 1024px) {
     .game-layout {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto 1fr;
+        grid-template-areas: 
+            "cats cats"
+            "selector preview";
         gap: 15px;
         height: calc(100vh - 30px);
+        align-items: start;
     }
 
     #gameScreen {
@@ -1176,6 +1185,7 @@ body {
     }
 
     .categories {
+        grid-area: cats;
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: center;
@@ -1183,17 +1193,26 @@ body {
         gap: 10px;
     }
 
-    .category-btn {
-        flex: 1;
-        min-width: 140px;
-        padding: 18px 12px;
-        font-size: 15px;
+    .clothing-container {
+        grid-area: selector;
+        padding: 20px;
+        height: 100%;
+        overflow-y: auto;
     }
 
     .preview-container {
-        order: -1;
-        height: auto;
-        max-height: 35vh; /* Mobilde üst kısım için yer bırak */
+        grid-area: preview;
+        order: unset;
+        height: 100%;
+        max-height: none;
+        overflow-y: auto;
+    }
+
+    .category-btn {
+        flex: 1;
+        min-width: 100px;
+        padding: 12px;
+        font-size: 15px;
     }
 
     .preview-primary-actions {
@@ -1202,21 +1221,17 @@ body {
     }
 
     .preview-character {
-        width: clamp(240px, 48vw, 360px);
+        width: clamp(200px, 30vw, 300px);
         height: auto;
-        max-height: 35vh; /* 25vh -> 35vh */
-        margin: -18px auto 5px auto; /* +10px daha yukarı */
+        max-height: 50vh;
+        margin: 0 auto 10px auto;
         display: block;
     }
 
     .item-placeholder {
-        width: 220px;
-        height: 220px;
+        width: 200px;
+        height: 200px;
         font-size: 80px;
-    }
-
-    .clothing-container {
-        padding: 20px;
     }
 
     .item-name {
@@ -1243,28 +1258,50 @@ body {
 }
 
 @media (max-width: 768px) {
-    #scoreScreen {
-        padding: 5px;
-    }
-    
-    .score-container {
-        gap: 8px;
-        padding: 5px 10px;
-    }
-    
-    body {
-        overflow: hidden;
-    }
-
-    .screen {
-        height: 100vh;
-        overflow: hidden;
-    }
-
     .game-layout {
+        display: flex;
+        flex-direction: column;
         height: calc(100vh - 30px);
         overflow-y: auto;
         overflow-x: hidden;
+    }
+
+    .categories {
+        flex-shrink: 0;
+    }
+    
+    .clothing-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto;
+        gap: 10px;
+        padding: 15px;
+        flex-shrink: 0;
+    }
+
+    .clothing-display {
+        grid-column: 1 / -1;
+        grid-row: 1;
+        order: unset;
+    }
+
+    .prev-btn {
+        grid-column: 1;
+        grid-row: 2;
+        order: unset;
+        width: 100%;
+    }
+
+    .next-btn {
+        grid-column: 2;
+        grid-row: 2;
+        order: unset;
+        width: 100%;
+    }
+
+    .preview-container {
+        flex-shrink: 0;
+        max-height: none; /* İçeriğe göre uzasın */
     }
 
     .score-section,
@@ -1450,23 +1487,8 @@ body {
         font-size: 60px;
     }
 
-    .clothing-container {
-        flex-direction: column;
-        gap: 12px;
-        padding: 15px;
-    }
-
-    .clothing-display {
-        order: 2;
-    }
-
-    .prev-btn {
-        order: 1;
-    }
-
-    .next-btn {
-        order: 3;
-    }
+    /* Grid layout inherited from 768px query is better for mobile */
+    /* Removed legacy flexbox reordering */
 
     .nav-btn {
         width: 100%;

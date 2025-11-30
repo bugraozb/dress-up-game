@@ -1,3 +1,59 @@
+// ==========================================
+// GOOGLE SHEETS ENTEGRASYONU
+// ==========================================
+// Bu URL'yi kendi Google Apps Script Web App URL'niz ile değiştirin
+// Nasıl alınır: README.md dosyasındaki "Google Sheets Entegrasyonu" bölümüne bakın
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxwe4Kylx2VTs1bdlz6X6uZnxQFo9RvmV-Cz_ZJ7o9Pa911hI31KAyFhOQZFGESI2lrLw/exec";
+
+// Google Sheets'e veri gönderme fonksiyonu
+async function saveToGoogleSheets(impact) {
+    // URL ayarlanmamışsa fonksiyonu atla
+    if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL === "YOUR_GOOGLE_SCRIPT_URL_HERE") {
+        console.log("Google Sheets URL ayarlanmamış. Veri kaydedilmedi.");
+        return;
+    }
+
+    // Seçilen kıyafetlerin özetini oluştur
+    const outfitSummary = Object.entries(gameState.selectedItems)
+        .map(([category, item]) => {
+            if (!item) return '';
+            return `${item.name} (${item.brand})`;
+        })
+        .filter(Boolean)
+        .join(' | ');
+
+    // Gönderilecek veri
+    const dataToSend = {
+        score: impact.totalImpact,
+        ecoRating: impact.ecoRating,
+        water: impact.waterUsed,
+        co2: impact.co2Emitted,
+        energy: impact.energyUsed,
+        outfitSummary: outfitSummary,
+        language: currentLanguage,
+        budget: budgetState.total,
+        spent: calculateCurrentSpend()
+    };
+
+    try {
+        await fetch(GOOGLE_SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors", // Google Apps Script CORS kısıtlaması için gerekli
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(dataToSend)
+        });
+        console.log("✅ Veri Google Sheets'e gönderildi!");
+    } catch (error) {
+        console.error("❌ Google Sheets'e veri gönderilemedi:", error);
+    }
+}
+
+// ==========================================
+// TRANSLATIONS (Çeviriler)
+// ==========================================
+
 // Translations
 const translations = {
     en: {
@@ -1071,6 +1127,9 @@ function displayResults() {
 
     const impact = calculateImpact();
     recordSession(impact);
+    
+    // Google Sheets'e kaydet (arka planda çalışır)
+    saveToGoogleSheets(impact);
 
     // Show initial score with random number
     const randomScore = Math.floor(Math.random() * 900000) + 100000;
