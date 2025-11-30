@@ -381,6 +381,7 @@ button {
     font-size: 100px;
     color: var(--primary-light);
     transition: all 0.3s ease;
+    position: relative;
 }
 
 .item-placeholder.has-image {
@@ -417,6 +418,29 @@ button {
 /* Ayakkabı görselleri için konum */
 .item-placeholder .item-image-shoes {
     transform: scale(4) translateY(-40%) translateX(6%); /* Buradan ayarla */
+}
+
+/* Kıyafet Badge (Köşe Emojisi) */
+.item-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 24px;
+    z-index: 10;
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    border: 2px solid var(--primary-color);
+    transition: all 0.3s ease;
+}
+
+.item-badge:empty {
+    display: none;
 }
 
 .item-name {
@@ -758,14 +782,36 @@ button {
     background: radial-gradient(circle at top right, var(--score-bg-start) 0%, var(--score-bg-mid) 45%, var(--score-bg-end) 100%);
     padding: 10px; /* Padding azaltıldı - içeriğin sığması için */
     box-sizing: border-box;
-    overflow: hidden; /* Kaydırma çubuğu tamamen kaldırıldı */
+    overflow-y: auto; /* Dikey kaydırma aktif */
+    overflow-x: hidden; /* Yatay kaydırma kapalı */
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start; /* Üstten başla */
     width: 100vw; /* Tam ekran genişliği */
-    height: 100vh; /* Tam ekran yüksekliği - scrollbar olmayacak */
+    height: 100vh; /* Tam ekran yüksekliği */
+}
+
+/* Score screen için scrollbar görünür yap */
+#scoreScreen::-webkit-scrollbar {
+    width: 12px;
+    display: block;
+}
+
+#scoreScreen::-webkit-scrollbar-track {
+    background: rgba(40, 28, 56, 0.5);
+    border-radius: 6px;
+}
+
+#scoreScreen::-webkit-scrollbar-thumb {
+    background: rgba(248, 140, 172, 0.6);
+    border-radius: 6px;
+    border: 2px solid rgba(40, 28, 56, 0.3);
+}
+
+#scoreScreen::-webkit-scrollbar-thumb:hover {
+    background: rgba(248, 140, 172, 0.8);
 }
 
 #scoreScreen::before {
@@ -784,37 +830,38 @@ button {
     position: relative;
     width: 100%;
     max-width: min(1400px, 95vw); /* Ekran genişliğine göre dinamik ayarlanır */
-    overflow: hidden; /* Taşmaları engeller */
+    overflow: visible; /* Taşmalara izin ver */
     margin: 0 auto; /* Skor alanını yatayda ortalar */
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    gap: clamp(10px, 2vh, 20px); /* Dinamik boşluk - ekran boyutuna göre */
-    padding: 10px 20px; /* Kenar boşlukları azaltıldı */
-    height: 100%; /* Container yüksekliği tam kullanılır */
+    justify-content: flex-start; /* Üstten başla */
+    gap: clamp(15px, 3vh, 30px); /* Dinamik boşluk artırıldı */
+    padding: clamp(20px, 4vh, 40px) 20px clamp(40px, 6vh, 60px) 20px; /* Üst ve alt padding artırıldı */
+    min-height: auto; /* İçeriğe göre boyutlan */
 }
 
 .score-section {
-    flex: 1;
+    flex: 0 0 auto; /* İçeriğe göre boyutlan, sıkışmasın */
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     width: 100%;
-    min-height: 0;
+    min-height: auto; /* İçeriğe göre boyutlan */
+    padding: clamp(10px, 2vh, 20px) 0; /* Dikey padding eklendi */
 }
 
 .impact-section {
-    flex: 1;
+    flex: 0 0 auto; /* İçeriğe göre boyutlan, sıkışmasın */
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start; /* Üstten başla */
     align-items: center;
-    gap: 10px;
+    gap: clamp(15px, 2vh, 25px); /* Gap artırıldı */
     width: 100%;
-    padding: 20px;
+    padding: clamp(15px, 2.5vh, 30px) 20px; /* Padding artırıldı */
     box-sizing: border-box;
-    min-height: 0;
+    min-height: auto; /* İçeriğe göre boyutlan */
 }
 
 .score-section.hidden,
@@ -826,10 +873,11 @@ button {
     margin: 0 auto;
     width: 100%;
     max-width: 100%; /* Tam genişlik kullanımı için */
-    height: 100%;
+    min-height: auto; /* İçeriğe göre boyutlan */
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start; /* Üstten başla, sıkışmasın */
+    gap: clamp(12px, 2vh, 20px); /* Elemanlar arası boşluk */
 }
 
 .score-display,
@@ -878,11 +926,12 @@ button {
 .score-actions {
     display: none;
     justify-content: center;
-    margin-top: clamp(12px, 2vh, 25px);
-    margin-bottom: clamp(10px, 1.5vh, 20px);
+    margin-top: clamp(20px, 3vh, 35px); /* Margin artırıldı */
+    margin-bottom: clamp(15px, 2.5vh, 30px); /* Margin artırıldı */
     position: relative;
     z-index: 2;
     gap: clamp(8px, 1.5vw, 16px);
+    flex: 0 0 auto; /* İçeriğe göre boyutlan */
 }
 
 .impact-display.active+.score-actions,
@@ -893,11 +942,11 @@ button {
 .impact-stats {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(200px, 23vw), 1fr)); /* Otomatik responsive grid */
-    gap: clamp(10px, 1.5vw, 20px); /* Dinamik boşluk */
-    margin-bottom: clamp(12px, 2vh, 24px);
-    overflow: hidden;
+    gap: clamp(12px, 2vw, 24px); /* Dinamik boşluk artırıldı */
+    margin-bottom: clamp(15px, 2.5vh, 30px); /* Margin artırıldı */
+    overflow: visible; /* Taşmalara izin ver */
     width: 100%;
-    max-height: 40vh; /* Maksimum yükseklik sınırı */
+    min-height: auto; /* İçeriğe göre boyutlan */
 }
 
 .stat-item {
@@ -953,17 +1002,17 @@ button {
 
 .impact-message {
     background-color: var(--score-overlay-bg);
-    padding: clamp(12px, 2vh, 24px);
+    padding: clamp(15px, 2.5vh, 30px) clamp(15px, 2vw, 25px); /* Padding artırıldı */
     border-radius: 12px;
-    margin-bottom: clamp(10px, 1.5vh, 20px);
+    margin-bottom: clamp(15px, 2.5vh, 30px); /* Margin artırıldı */
     border: 1px solid var(--score-overlay-border);
     backdrop-filter: blur(18px);
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
-    max-height: 15vh; /* Yükseklik sınırı */
-    overflow-y: auto; /* Gerekirse kaydırma */
+    min-height: auto; /* İçeriğe göre boyutlan */
+    overflow: visible; /* Taşmalara izin ver */
 }
 
 .impact-message p {
@@ -975,17 +1024,17 @@ button {
 
 .sustainability-facts {
     background-color: var(--score-overlay-bg);
-    padding: clamp(12px, 2vh, 22px);
+    padding: clamp(15px, 2.5vh, 30px) clamp(15px, 2vw, 25px); /* Padding artırıldı */
     border-radius: 12px;
-    margin-bottom: clamp(12px, 2vh, 25px);
+    margin-bottom: clamp(15px, 2.5vh, 30px); /* Margin artırıldı */
     border: 1px solid var(--score-overlay-border);
     backdrop-filter: blur(18px);
     text-align: left;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    max-height: 20vh; /* Yükseklik sınırı */
-    overflow-y: auto; /* Gerekirse kaydırma */
+    justify-content: flex-start; /* Üstten başla */
+    min-height: auto; /* İçeriğe göre boyutlan */
+    overflow: visible; /* Taşmalara izin ver */
 }
 
 .sustainability-facts h3 {
@@ -1006,11 +1055,11 @@ button {
     background-color: var(--score-overlay-bg);
     border: 1px solid var(--score-overlay-border);
     border-radius: 12px;
-    padding: clamp(10px, 1.5vh, 18px) clamp(12px, 2vw, 20px);
-    margin-bottom: clamp(12px, 2vh, 25px);
+    padding: clamp(15px, 2.5vh, 25px) clamp(15px, 2vw, 25px); /* Padding artırıldı */
+    margin-bottom: clamp(15px, 2.5vh, 30px); /* Margin artırıldı */
     backdrop-filter: blur(18px);
-    max-height: 25vh; /* Viewport yüksekliğine göre sınır */
-    overflow-y: auto; /* İçerik taşarsa kaydır */
+    min-height: auto; /* İçeriğe göre boyutlan */
+    overflow: visible; /* Taşmalara izin ver */
 }
 
 .history-header {
@@ -1107,6 +1156,28 @@ button {
     box-shadow: 0 10px 24px rgba(31, 16, 44, 0.6);
 }
 
+/* Bilgilendirici Bölüm */
+.info-section {
+    width: 100%;
+    max-width: min(1400px, 95vw);
+    margin: clamp(20px, 4vh, 40px) auto 0 auto;
+    padding: 0 20px 40px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.info-image {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    border-radius: 16px;
+    box-shadow: 0 12px 40px rgba(10, 8, 18, 0.6);
+    border: 2px solid var(--score-card-border);
+    object-fit: contain;
+    display: block;
+}
+
 /* Responsive Design */
 /* Büyük ekranlar için ek optimizasyonlar */
 @media (min-width: 1600px) {
@@ -1156,8 +1227,22 @@ button {
     }
     
     .score-container {
-        gap: 12px;
-        padding: 8px 15px;
+        gap: clamp(12px, 2vh, 20px);
+        padding: clamp(15px, 3vh, 30px) 15px clamp(30px, 5vh, 50px) 15px;
+    }
+    
+    .score-section {
+        padding: clamp(8px, 1.5vh, 15px) 0;
+    }
+    
+    .impact-section {
+        padding: clamp(12px, 2vh, 25px) 15px;
+        gap: clamp(12px, 1.5vh, 20px);
+    }
+    
+    .info-section {
+        padding: 0 15px 30px 15px;
+        margin-top: clamp(15px, 3vh, 30px);
     }
 }
 
@@ -1265,6 +1350,23 @@ button {
         overflow-y: auto;
         overflow-x: hidden;
     }
+    
+    .item-badge {
+        font-size: 20px;
+        width: 32px;
+        height: 32px;
+        top: 6px;
+        right: 6px;
+    }
+    
+    .info-section {
+        padding: 0 10px 20px 10px;
+        margin-top: clamp(15px, 2vh, 25px);
+    }
+    
+    .info-image {
+        border-radius: 12px;
+    }
 
     .categories {
         flex-shrink: 0;
@@ -1304,10 +1406,15 @@ button {
         max-height: none; /* İçeriğe göre uzasın */
     }
 
-    .score-section,
-    .impact-section {
+    .score-section {
+        padding: clamp(8px, 1.5vh, 15px) 0;
         min-height: auto;
-        padding: 0;
+    }
+    
+    .impact-section {
+        padding: clamp(10px, 2vh, 20px) 10px;
+        gap: clamp(10px, 1.5vh, 18px);
+        min-height: auto;
     }
 
     .preview-primary-actions {
@@ -1459,8 +1566,34 @@ button {
     }
     
     .score-container {
-        gap: 5px;
-        padding: 3px 8px;
+        gap: clamp(8px, 1.5vh, 15px);
+        padding: clamp(10px, 2vh, 20px) 8px clamp(20px, 4vh, 35px) 8px;
+    }
+    
+    .item-badge {
+        font-size: 18px;
+        width: 28px;
+        height: 28px;
+        top: 5px;
+        right: 5px;
+    }
+    
+    .score-section {
+        padding: clamp(5px, 1vh, 10px) 0;
+    }
+    
+    .impact-section {
+        padding: clamp(8px, 1.5vh, 15px) 8px;
+        gap: clamp(8px, 1vh, 15px);
+    }
+    
+    .info-section {
+        padding: 0 8px 15px 8px;
+        margin-top: clamp(10px, 2vh, 20px);
+    }
+    
+    .info-image {
+        border-radius: 10px;
     }
     
     .impact-stats {
@@ -1530,7 +1663,7 @@ button {
     .stat-item {
         padding: 10px 8px;
     }
-    
+
     .stat-item h2 {
         font-size: 24px; /* Çok küçük ekranlarda daha da küçük */
     }

@@ -58,7 +58,9 @@
                 <button class="nav-btn prev-btn">&larr;</button>
                 <div class="clothing-display">
                     <div class="clothing-item">
-                        <div class="item-placeholder"></div>
+                        <div class="item-placeholder">
+                            <span class="item-badge"></span>
+                        </div>
                         <h3 class="item-name"></h3>
                         <div class="item-details">
                             <p><strong data-i18n="priceLabel">Price:</strong> <span class="item-detail-value"
@@ -129,13 +131,7 @@
     <!-- Score Screen -->
     <div id="scoreScreen" class="screen">
         <div class="score-container">
-            <div class="score-section">
-                <div id="initialScore" class="score-display active">
-                    <h1 data-i18n="score">SCORE</h1>
-                    <div class="score-number">*********</div>
-                </div>
-            </div>
-            <div class="impact-section hidden">
+            <div class="impact-section">
                 <div id="impactScreen" class="impact-display">
                     <h1 data-i18n="environmentalImpact">Environmental Impact</h1>
                     <div class="impact-stats">
@@ -163,19 +159,15 @@
                         <h3 data-i18n="didYouKnow">💡 Did You Know?</h3>
                         <p id="sustainabilityFact"></p>
                     </div>
-                    <div class="session-history">
-                        <div class="history-header">
-                            <h3 data-i18n="recentOutfits">Recent Outfits</h3>
-                            <button id="exportHistoryBtn" class="btn-secondary history-export" data-i18n="exportHistory">
-                                Export History
-                            </button>
-                        </div>
-                        <ul id="sessionHistoryList" class="history-list"></ul>
-                    </div>
                 </div>
             </div>
             <div class="score-actions">
                 <button id="playAgainBtn" class="btn-primary" data-i18n="playAgain">Play Again</button>
+            </div>
+            <div class="info-section">
+                <img src="assets/images/finnal_screen/Blue Modern How To Our Protect Our Earth Infographic.png" 
+                     alt="Environmental Protection Information" 
+                     class="info-image">
             </div>
         </div>
     </div>

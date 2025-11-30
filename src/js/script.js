@@ -247,9 +247,6 @@ const budgetState = {
     total: 0
 };
 
-const SESSION_STORAGE_KEY = 'dressUpPilotHistory';
-const MAX_HISTORY_ENTRIES = 20;
-
 // Get clothing type name based on current language
 function getTypeName(type) {
     if (type === clothingTypes.ECO_FRIENDLY) return translations[currentLanguage].ecoFriendly;
@@ -273,6 +270,124 @@ function formatPrice(value) {
 function getRandomFromArray(array) {
     if (!array || array.length === 0) return '';
     return array[Math.floor(Math.random() * array.length)];
+}
+
+// Gerçekçi fiyatlandırma fonksiyonu (marka, malzeme ve duruma göre)
+function getRealisticPrice(category, brand, material, isSecondhand, isEcoFriendly) {
+    // Kategori bazlı temel fiyat aralıkları
+    const basePrices = {
+        outerwear: { min: 80, max: 550 },
+        bottoms: { min: 50, max: 350 },
+        shoes: { min: 60, max: 400 }
+    };
+
+    const baseRange = basePrices[category] || { min: 100, max: 300 };
+    
+    // İkinci el ürünler: %30-40 fiyat
+    if (isSecondhand) {
+        return Math.round((baseRange.min + baseRange.max) / 2 * 0.35);
+    }
+
+    // Marka bazlı fiyat belirleme (gerçekçi fiyatlar)
+    let price;
+    const premiumMaterials = ['kaşmir', 'cashmere', 'ipek', 'silk', 'yün', 'wool', 'deri', 'leather'];
+    const materialLower = material.toLowerCase();
+    const hasPremiumMaterial = premiumMaterials.some(pm => materialLower.includes(pm));
+
+    switch(brand) {
+        // EN PAHALI MARKALAR
+        case 'Vokka':
+            price = category === 'outerwear' ? (hasPremiumMaterial ? 520 : 450) :
+                   category === 'bottoms' ? (hasPremiumMaterial ? 340 : 300) :
+                   category === 'shoes' ? (hasPremiumMaterial ? 380 : 320) : 400;
+            break;
+        case 'Bayman':
+            price = category === 'outerwear' ? (hasPremiumMaterial ? 500 : 420) :
+                   category === 'bottoms' ? (hasPremiumMaterial ? 320 : 280) :
+                   category === 'shoes' ? (hasPremiumMaterial ? 360 : 300) : 380;
+            break;
+        
+        // PAHALI MARKALAR
+        case 'MMF':
+            price = category === 'outerwear' ? (isEcoFriendly ? 280 : 240) :
+                   category === 'bottoms' ? (isEcoFriendly ? 180 : 150) :
+                   category === 'shoes' ? (isEcoFriendly ? 200 : 170) : 200;
+            break;
+        case 'Mengo':
+            price = category === 'outerwear' ? (isEcoFriendly ? 300 : 260) :
+                   category === 'bottoms' ? (isEcoFriendly ? 190 : 160) :
+                   category === 'shoes' ? (isEcoFriendly ? 210 : 180) : 210;
+            break;
+        case 'Zera':
+            price = category === 'outerwear' ? 250 :
+                   category === 'bottoms' ? 160 :
+                   category === 'shoes' ? 180 : 200;
+            break;
+        case 'Ertuğrul Kundura':
+            price = category === 'shoes' ? (hasPremiumMaterial ? 320 : 280) : 300;
+            break;
+        case 'NINE EAST':
+            price = category === 'shoes' ? (hasPremiumMaterial ? 350 : 300) : 320;
+            break;
+        
+        // AZ PAHALI MARKALAR
+        case 'Dididos':
+            price = category === 'shoes' ? (isEcoFriendly ? 180 : 160) : 170;
+            break;
+        
+        // ORTA MARKALAR
+        case 'Miav':
+            price = category === 'outerwear' ? (isEcoFriendly ? 200 : 180) :
+                   category === 'bottoms' ? (isEcoFriendly ? 130 : 110) :
+                   category === 'shoes' ? (isEcoFriendly ? 150 : 130) : 150;
+            break;
+        case 'H&W':
+            price = category === 'outerwear' ? 180 :
+                   category === 'bottoms' ? 110 :
+                   category === 'shoes' ? 130 : 140;
+            break;
+        
+        // ORTA ALTI MARKALAR
+        case 'Oxxa':
+            price = category === 'outerwear' ? 150 :
+                   category === 'bottoms' ? 90 :
+                   category === 'shoes' ? 110 : 120;
+            break;
+        case "Jollin's":
+            price = category === 'outerwear' ? 140 :
+                   category === 'bottoms' ? 85 :
+                   category === 'shoes' ? 100 : 110;
+            break;
+        
+        // UYGUN MARKALAR
+        case 'TrendModa':
+            price = category === 'outerwear' ? 120 :
+                   category === 'bottoms' ? 70 :
+                   category === 'shoes' ? 85 : 90;
+            break;
+        
+        // EN UCUZ MARKALAR
+        case 'TIMU':
+            price = category === 'outerwear' ? 100 :
+                   category === 'bottoms' ? 60 :
+                   category === 'shoes' ? 75 : 80;
+            break;
+        case 'SHINE':
+            price = category === 'outerwear' ? 110 :
+                   category === 'bottoms' ? 65 :
+                   category === 'shoes' ? 80 : 85;
+            break;
+        
+        default:
+            price = (baseRange.min + baseRange.max) / 2;
+    }
+
+    // Geri dönüşüm ürünleri için ekstra (%5-8)
+    if (isEcoFriendly && !isSecondhand) {
+        price = Math.round(price * 1.06);
+    }
+
+    return Math.round(price);
 }
 
 function initializeBudget() {
@@ -303,141 +418,6 @@ function updateBudgetUI() {
     budgetElements.remaining.textContent = formatPrice(remaining);
 
     budgetElements.remaining.parentElement.classList.toggle('over-budget', remaining === 0 && budgetState.total > 0);
-}
-
-function loadSessionHistory() {
-    try {
-        const stored = localStorage.getItem(SESSION_STORAGE_KEY);
-        return stored ? JSON.parse(stored) : [];
-    } catch (error) {
-        console.warn('Unable to load session history', error);
-        return [];
-    }
-}
-
-function saveSessionHistory(history) {
-    try {
-        localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(history));
-    } catch (error) {
-        console.warn('Unable to save session history', error);
-    }
-}
-
-function recordSession(impact) {
-    const history = loadSessionHistory();
-    const entry = {
-        timestamp: new Date().toISOString(),
-        language: currentLanguage,
-        budget: budgetState.total,
-        spend: calculateCurrentSpend(),
-        ecoRating: impact.ecoRating,
-        waterUsed: impact.waterUsed,
-        co2Emitted: impact.co2Emitted,
-        energyUsed: impact.energyUsed,
-        items: Object.entries(gameState.selectedItems).map(([category, item]) => ({
-            category,
-            name: item?.name || '',
-            price: item?.price || 0,
-            emoji: item?.emoji || ''
-        }))
-    };
-
-    history.push(entry);
-    while (history.length > MAX_HISTORY_ENTRIES) {
-        history.shift();
-    }
-
-    saveSessionHistory(history);
-    renderSessionHistory(history);
-}
-
-function renderSessionHistory(existingHistory = null) {
-    const historyList = historyElements.list;
-    if (!historyList) return;
-
-    const history = existingHistory ?? loadSessionHistory();
-    historyList.innerHTML = '';
-
-    if (!history || history.length === 0) {
-        const emptyItem = document.createElement('li');
-        emptyItem.className = 'history-empty';
-        emptyItem.textContent = translations[currentLanguage].emptyHistory;
-        historyList.appendChild(emptyItem);
-        return;
-    }
-
-    const latest = history.slice().reverse().slice(0, 3);
-    latest.forEach(entry => {
-        const listItem = document.createElement('li');
-        listItem.className = 'history-item';
-
-        const date = new Date(entry.timestamp).toLocaleString(getCurrentLocale(), {
-            dateStyle: 'medium',
-            timeStyle: 'short'
-        });
-
-        const outfitSummary = entry.items.map(item => `${item.emoji} ${item.name}`).join(' • ');
-
-        listItem.innerHTML = `
-            <div class="history-row">
-                <span class="history-date">${date}</span>
-                <span class="history-eco">ECO ${entry.ecoRating}</span>
-            </div>
-            <div class="history-outfit">${outfitSummary}</div>
-            <div class="history-impact">
-                💧 ${entry.waterUsed?.toLocaleString() || 0} L | 🌬️ ${entry.co2Emitted || 0} kg CO2 | ⚡ ${entry.energyUsed || 0} kWh
-            </div>
-        `;
-
-        historyList.appendChild(listItem);
-    });
-}
-
-function buildHistoryCSV(history) {
-    const headers = [
-        'timestamp',
-        'language',
-        'budget',
-        'spend',
-        'ecoRating',
-        'waterUsed',
-        'co2Emitted',
-        'energyUsed',
-        'items'
-    ];
-
-    const rows = history.map(entry => {
-        const outfitSummary = entry.items.map(item => `${item.category}:${item.name}(${item.price})`).join(' | ');
-        const values = [
-            entry.timestamp,
-            entry.language,
-            entry.budget,
-            entry.spend,
-            entry.ecoRating,
-            entry.waterUsed,
-            entry.co2Emitted,
-            entry.energyUsed,
-            outfitSummary
-        ];
-
-        return values
-            .map(value => `"${String(value ?? '').replace(/"/g, '""')}"`)
-            .join(',');
-    });
-
-    return [headers.join(','), ...rows].join('\n');
-}
-
-function downloadCSV(content, filename) {
-    const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', filename);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
 }
 
 function getImpactContextTip(impact) {
@@ -546,109 +526,260 @@ function generateClothingItems() {
                 ? Math.round(((range.min + range.max) / 2) / 10) * 10
                 : 200;
 
-            // Top 1 = Oxxa Kazak (%50 pamuk, %40 poliamid, %10 alpaka)
+            // Top 1 = Oxxa Bluz (%50 pamuk, %40 poliamid, %10 alpaka) - Orta altı marka
+            const top1Material = currentLanguage === 'tr' ? '%50 Pamuk, %40 Poliamid, %10 Alpaka' : '50% Cotton, 40% Polyamide, 10% Alpaca';
             curatedOuterwear.push(createRandomItem(0, {
                 id: 'outerwear-top1',
-                name: currentLanguage === 'tr' ? 'Oxxa Kazak' : 'Oxxa Sweater',
+                name: currentLanguage === 'tr' ? 'Oxxa Bluz' : 'Oxxa Blouse',
                 type: clothingTypes.BRAND_NEW,
                 emoji: '👚',
                 image: 'assets/images/tops/top1.png',
-                price: Math.round(averageOuterwearPrice * 1.2),
+                price: getRealisticPrice('outerwear', 'Oxxa', top1Material, false, false),
                 condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
-                material: currentLanguage === 'tr' ? '%50 Pamuk, %40 Poliamid, %10 Alpaka' : '50% Cotton, 40% Polyamide, 10% Alpaca',
+                material: top1Material,
                 brand: 'Oxxa',
                 previewTransform: { x: 0, y: 63, width: 200, height: 270 },
                 environmentalImpact: { water: 770, co2: 11.5, energy: 18 }
             }));
 
-            // Top 2 = MMF Bluz (%65 pamuk, %35 geri dönüştürülmüş polyester)
+            // Top 2 = MMF Kazak (%65 pamuk, %35 geri dönüştürülmüş polyester) - Pahalı marka, geri dönüşüm
+            const top2Material = currentLanguage === 'tr' ? '%65 Pamuk, %35 Geri Dön. Polyester' : '65% Cotton, 35% Recycled Polyester';
             curatedOuterwear.push(createRandomItem(1, {
                 id: 'outerwear-top2',
-                name: currentLanguage === 'tr' ? 'MMF Bluz' : 'MMF Blouse',
+                name: currentLanguage === 'tr' ? 'MMF Kazak' : 'MMF Sweater',
                 type: clothingTypes.ECO_FRIENDLY,
                 emoji: '👕',
                 image: 'assets/images/tops/top2.png',
-                price: Math.round(averageOuterwearPrice * 0.9),
+                price: getRealisticPrice('outerwear', 'MMF', top2Material, false, true),
                 condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
-                material: currentLanguage === 'tr' ? '%65 Pamuk, %35 Geri Dön. Polyester' : '65% Cotton, 35% Recycled Polyester',
+                material: top2Material,
                 brand: 'MMF',
                 previewTransform: { x: 0, y: 63, width: 200, height: 270 },
                 environmentalImpact: { water: 525, co2: 5.75, energy: 8 }
             }));
 
-            // Top 3 = Zera Gömlek (%100 pamuk)
+            // Top 3 = Zera Gömlek (%100 pamuk) - Pahalı marka
+            const top3Material = currentLanguage === 'tr' ? '%100 Pamuk' : '100% Cotton';
             curatedOuterwear.push(createRandomItem(2, {
                 id: 'outerwear-top3',
                 name: currentLanguage === 'tr' ? 'Zera Gömlek' : 'Zera Shirt',
                 type: clothingTypes.BRAND_NEW,
                 emoji: '👔',
                 image: 'assets/images/tops/top3.png',
-                price: Math.round(averageOuterwearPrice * 1.1),
+                price: getRealisticPrice('outerwear', 'Zera', top3Material, false, false),
                 condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
-                material: currentLanguage === 'tr' ? '%100 Pamuk' : '100% Cotton',
+                material: top3Material,
                 brand: 'Zera',
                 previewTransform: { x: 0, y: 63, width: 200, height: 270 },
                 environmentalImpact: { water: 850, co2: 10, energy: 12 }
             }));
 
-            // Top 3 Blue = Bayman Gömlek (%95 ipek, %5 elastan)
+            // Top 3 Blue = Bayman Gömlek (%95 ipek, %5 elastan) - En pahalı marka, premium malzeme (ipek)
+            const top3BlueMaterial = currentLanguage === 'tr' ? '%95 İpek, %5 Elastan' : '95% Silk, 5% Elastane';
             curatedOuterwear.push(createRandomItem(3, {
                 id: 'outerwear-top3-blue',
                 name: currentLanguage === 'tr' ? 'Bayman Gömlek' : 'Bayman Shirt',
                 type: clothingTypes.BRAND_NEW,
                 emoji: '👔',
                 image: 'assets/images/tops/top3blue.png',
-                price: Math.round(averageOuterwearPrice * 1.8),
+                price: getRealisticPrice('outerwear', 'Bayman', top3BlueMaterial, false, false),
                 condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
-                material: currentLanguage === 'tr' ? '%95 İpek, %5 Elastan' : '95% Silk, 5% Elastane',
+                material: top3BlueMaterial,
                 brand: 'Bayman',
                 previewTransform: { x: 0, y: 63, width: 200, height: 270 },
                 environmentalImpact: { water: 4150, co2: 15, energy: 18 }
             }));
 
-            // Top 1 Gray = H&W Kazak (%73 akrilik, %25 polyester, %2 elastan)
+            // Top 1 Gray = H&W Kazak (%73 akrilik, %25 polyester, %2 elastan) - Orta marka
+            const top1GrayMaterial = currentLanguage === 'tr' ? '%73 Akrilik, %25 Polyester, %2 Elastan' : '73% Acrylic, 25% Polyester, 2% Elastane';
             curatedOuterwear.push(createRandomItem(4, {
                 id: 'outerwear-top1-gray',
                 name: currentLanguage === 'tr' ? 'H&W Kazak' : 'H&W Sweater',
                 type: clothingTypes.BRAND_NEW,
                 emoji: '👚',
                 image: 'assets/images/tops/top1gray.png',
-                price: Math.round(averageOuterwearPrice * 0.7),
+                price: getRealisticPrice('outerwear', 'H&W', top1GrayMaterial, false, false),
                 condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
-                material: currentLanguage === 'tr' ? '%73 Akrilik, %25 Polyester, %2 Elastan' : '73% Acrylic, 25% Polyester, 2% Elastane',
+                material: top1GrayMaterial,
                 brand: 'H&W',
                 previewTransform: { x: 0, y: 63, width: 200, height: 270 },
                 environmentalImpact: { water: 100, co2: 14, energy: 23 }
             }));
 
-            // Top 2 Yellow = H&W Bluz (%92 viskoz, %8 elastan)
+            // Top 2 Yellow = H&W Bluz (%92 viskoz, %8 elastan) - Orta marka
+            const top2YellowMaterial = currentLanguage === 'tr' ? '%92 Viskoz, %8 Elastan' : '92% Viscose, 8% Elastane';
             curatedOuterwear.push(createRandomItem(5, {
                 id: 'outerwear-top2-yellow',
                 name: currentLanguage === 'tr' ? 'H&W Bluz' : 'H&W Blouse',
                 type: clothingTypes.BRAND_NEW,
                 emoji: '👕',
                 image: 'assets/images/tops/top2yellow.png',
-                price: Math.round(averageOuterwearPrice * 0.8),
+                price: getRealisticPrice('outerwear', 'H&W', top2YellowMaterial, false, false),
                 condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
-                material: currentLanguage === 'tr' ? '%92 Viskoz, %8 Elastan' : '92% Viscose, 8% Elastane',
+                material: top2YellowMaterial,
                 brand: 'H&W',
                 previewTransform: { x: 0, y: 63, width: 200, height: 270 },
                 environmentalImpact: { water: 750, co2: 8.5, energy: 11 }
             }));
 
-            // Top 2 Yellow 2.El = H&W Bluz İkinci El (%92 viskoz, %8 elastan)
+            // Top 1 Black = Mengo Bluz İkinci El (%60 viskoz, %20 polyester, %20 akrilik) - Pahalı marka, ikinci el
+            const top1BlackMaterial = currentLanguage === 'tr' ? '%60 Viskoz, %20 Polyester, %20 Akrilik' : '60% Viscose, 20% Polyester, 20% Acrylic';
             curatedOuterwear.push(createRandomItem(6, {
-                id: 'outerwear-top2-yellow-2el',
-                name: currentLanguage === 'tr' ? 'H&W Bluz 2.El' : 'H&W Blouse 2nd Hand',
+                id: 'outerwear-top1-black',
+                name: currentLanguage === 'tr' ? 'Mengo Bluz' : 'Mengo Blouse',
                 type: clothingTypes.SECONDHAND,
                 emoji: '👕',
-                image: 'assets/images/tops/top2yellow_2el.png',
-                price: Math.round(averageOuterwearPrice * 0.4),
+                image: 'assets/images/tops/top1black.png',
+                price: getRealisticPrice('outerwear', 'Mengo', top1BlackMaterial, true, false),
                 condition: currentLanguage === 'tr' ? 'İyi Durumda' : 'Good Condition',
-                material: currentLanguage === 'tr' ? '%92 Viskoz, %8 Elastan' : '92% Viscose, 8% Elastane',
+                material: top1BlackMaterial,
+                brand: 'Mengo',
+                previewTransform: { x: 0, y: 63, width: 200, height: 270 },
+                environmentalImpact: { water: 0, co2: 0.8, energy: 1 }
+            }));
+
+            // Top 1 Green = Miav Bluz Sıfır (%70 modal, %20 akrilik, %10 polyester) - Orta marka
+            const top1GreenMaterial = currentLanguage === 'tr' ? '%70 Modal, %20 Akrilik, %10 Polyester' : '70% Modal, 20% Acrylic, 10% Polyester';
+            curatedOuterwear.push(createRandomItem(7, {
+                id: 'outerwear-top1-green',
+                name: currentLanguage === 'tr' ? 'Miav Bluz' : 'Miav Blouse',
+                type: clothingTypes.BRAND_NEW,
+                emoji: '👕',
+                image: 'assets/images/tops/top1green.png',
+                price: getRealisticPrice('outerwear', 'Miav', top1GreenMaterial, false, false),
+                condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
+                material: top1GreenMaterial,
+                brand: 'Miav',
+                previewTransform: { x: 0, y: 63, width: 200, height: 270 },
+                environmentalImpact: { water: 600, co2: 7, energy: 9 }
+            }));
+
+            // Top 1 Maroon = TIMU Bluz Sıfır (%100 polyester) - En ucuz marka
+            const top1MaroonMaterial = currentLanguage === 'tr' ? '%100 Polyester' : '100% Polyester';
+            curatedOuterwear.push(createRandomItem(8, {
+                id: 'outerwear-top1-maroon',
+                name: currentLanguage === 'tr' ? 'TIMU Bluz' : 'TIMU Blouse',
+                type: clothingTypes.BRAND_NEW,
+                emoji: '👕',
+                image: 'assets/images/tops/top1maroon.png',
+                price: getRealisticPrice('outerwear', 'TIMU', top1MaroonMaterial, false, false),
+                condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
+                material: top1MaroonMaterial,
+                brand: 'TIMU',
+                previewTransform: { x: 0, y: 63, width: 200, height: 270 },
+                environmentalImpact: { water: 50, co2: 9, energy: 12 }
+            }));
+
+            // Top 1 Purple = Vokka Bluz Sıfır (%100 kaşmir) - En pahalı marka, premium malzeme (kaşmir)
+            const top1PurpleMaterial = currentLanguage === 'tr' ? '%100 Kaşmir' : '100% Cashmere';
+            curatedOuterwear.push(createRandomItem(9, {
+                id: 'outerwear-top1-purple',
+                name: currentLanguage === 'tr' ? 'Vokka Bluz' : 'Vokka Blouse',
+                type: clothingTypes.BRAND_NEW,
+                emoji: '👕',
+                image: 'assets/images/tops/top1purple.png',
+                price: getRealisticPrice('outerwear', 'Vokka', top1PurpleMaterial, false, false),
+                condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
+                material: top1PurpleMaterial,
+                brand: 'Vokka',
+                previewTransform: { x: 0, y: 63, width: 200, height: 270 },
+                environmentalImpact: { water: 12000, co2: 25, energy: 30 }
+            }));
+
+            // Top 2 Blue = Bayman Kazak Sıfır (%100 yün) - En pahalı marka, premium malzeme (yün)
+            const top2BlueMaterial = currentLanguage === 'tr' ? '%100 Yün' : '100% Wool';
+            curatedOuterwear.push(createRandomItem(10, {
+                id: 'outerwear-top2-blue',
+                name: currentLanguage === 'tr' ? 'Bayman Kazak' : 'Bayman Sweater',
+                type: clothingTypes.BRAND_NEW,
+                emoji: '👚',
+                image: 'assets/images/tops/top2blue.png',
+                price: getRealisticPrice('outerwear', 'Bayman', top2BlueMaterial, false, false),
+                condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
+                material: top2BlueMaterial,
+                brand: 'Bayman',
+                previewTransform: { x: 0, y: 63, width: 200, height: 270 },
+                environmentalImpact: { water: 5000, co2: 20, energy: 25 }
+            }));
+
+            // Top 2 Green = Jollin's Kazak İkinci El (%90 akrilik, %10 yün) - Orta altı marka, ikinci el
+            const top2GreenMaterial = currentLanguage === 'tr' ? '%90 Akrilik, %10 Yün' : '90% Acrylic, 10% Wool';
+            curatedOuterwear.push(createRandomItem(11, {
+                id: 'outerwear-top2-green',
+                name: currentLanguage === 'tr' ? "Jollin's Kazak" : "Jollin's Sweater",
+                type: clothingTypes.SECONDHAND,
+                emoji: '👚',
+                image: 'assets/images/tops/top2green.png',
+                price: getRealisticPrice('outerwear', "Jollin's", top2GreenMaterial, true, false),
+                condition: currentLanguage === 'tr' ? 'İyi Durumda' : 'Good Condition',
+                material: top2GreenMaterial,
+                brand: "Jollin's",
+                previewTransform: { x: 0, y: 63, width: 200, height: 270 },
+                environmentalImpact: { water: 0, co2: 0.7, energy: 1 }
+            }));
+
+            // Top 2 Pink = MMF Kazak Sıfır (%60 geri dönüştürülmüş polyester, %40 geri dönüştürülmüş pamuk) - Pahalı marka, geri dönüşüm
+            const top2PinkMaterial = currentLanguage === 'tr' ? '%60 Geri Dön. Polyester, %40 Geri Dön. Pamuk' : '60% Recycled Polyester, 40% Recycled Cotton';
+            curatedOuterwear.push(createRandomItem(12, {
+                id: 'outerwear-top2-pink',
+                name: currentLanguage === 'tr' ? 'MMF Kazak' : 'MMF Sweater',
+                type: clothingTypes.ECO_FRIENDLY,
+                emoji: '👚',
+                image: 'assets/images/tops/top2pink.png',
+                price: getRealisticPrice('outerwear', 'MMF', top2PinkMaterial, false, true),
+                condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
+                material: top2PinkMaterial,
+                brand: 'MMF',
+                previewTransform: { x: 0, y: 63, width: 200, height: 270 },
+                environmentalImpact: { water: 200, co2: 4, energy: 7 }
+            }));
+
+            // Top 3 Green = Oxxa Gömlek İkinci El (%100 polyester) - Orta altı marka, ikinci el
+            const top3GreenMaterial = currentLanguage === 'tr' ? '%100 Polyester' : '100% Polyester';
+            curatedOuterwear.push(createRandomItem(13, {
+                id: 'outerwear-top3-green',
+                name: currentLanguage === 'tr' ? 'Oxxa Gömlek' : 'Oxxa Shirt',
+                type: clothingTypes.SECONDHAND,
+                emoji: '👔',
+                image: 'assets/images/tops/top3green.png',
+                price: getRealisticPrice('outerwear', 'Oxxa', top3GreenMaterial, true, false),
+                condition: currentLanguage === 'tr' ? 'İyi Durumda' : 'Good Condition',
+                material: top3GreenMaterial,
+                brand: 'Oxxa',
+                previewTransform: { x: 0, y: 63, width: 200, height: 270 },
+                environmentalImpact: { water: 0, co2: 0.7, energy: 1 }
+            }));
+
+            // Top 3 Purple = H&W Gömlek İkinci El (%63 pamuk, %30 polyester, %7 elastan) - Orta marka, ikinci el
+            const top3PurpleMaterial = currentLanguage === 'tr' ? '%63 Pamuk, %30 Polyester, %7 Elastan' : '63% Cotton, 30% Polyester, 7% Elastane';
+            curatedOuterwear.push(createRandomItem(14, {
+                id: 'outerwear-top3-purple',
+                name: currentLanguage === 'tr' ? 'H&W Gömlek' : 'H&W Shirt',
+                type: clothingTypes.SECONDHAND,
+                emoji: '👔',
+                image: 'assets/images/tops/top3purple.png',
+                price: getRealisticPrice('outerwear', 'H&W', top3PurpleMaterial, true, false),
+                condition: currentLanguage === 'tr' ? 'İyi Durumda' : 'Good Condition',
+                material: top3PurpleMaterial,
                 brand: 'H&W',
                 previewTransform: { x: 0, y: 63, width: 200, height: 270 },
                 environmentalImpact: { water: 0, co2: 0.75, energy: 1 }
+            }));
+
+            // Top 3 Yellow = Miav Gömlek Sıfır (%71 viskoz, %29 pamuk) - Orta marka
+            const top3YellowMaterial = currentLanguage === 'tr' ? '%71 Viskoz, %29 Pamuk' : '71% Viscose, 29% Cotton';
+            curatedOuterwear.push(createRandomItem(15, {
+                id: 'outerwear-top3-yellow',
+                name: currentLanguage === 'tr' ? 'Miav Gömlek' : 'Miav Shirt',
+                type: clothingTypes.BRAND_NEW,
+                emoji: '👔',
+                image: 'assets/images/tops/top3yellow.png',
+                price: getRealisticPrice('outerwear', 'Miav', top3YellowMaterial, false, false),
+                condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
+                material: top3YellowMaterial,
+                brand: 'Miav',
+                previewTransform: { x: 0, y: 63, width: 200, height: 270 },
+                environmentalImpact: { water: 700, co2: 8, energy: 10 }
             }));
 
             items[category] = curatedOuterwear;
@@ -661,64 +792,163 @@ function generateClothingItems() {
                 ? Math.round(((range.min + range.max) / 2) / 10) * 10
                 : 160;
 
-            // Bottom 1 = TrendModa Etek (%94 polyester, %6 elastan)
+            // Bottom 1 = TrendModa Etek (%94 polyester, %6 elastan) - Uygun marka
+            const bottom1Material = currentLanguage === 'tr' ? '%94 Polyester, %6 Elastan' : '94% Polyester, 6% Elastane';
             curatedBottoms.push(createRandomItem(0, {
                 id: 'bottoms-bottom1',
                 name: currentLanguage === 'tr' ? 'TrendModa Etek' : 'TrendModa Skirt',
                 type: clothingTypes.BRAND_NEW,
                 emoji: '👗',
                 image: 'assets/images/bottoms/bottom1.png',
-                price: Math.round(averageBottomsPrice * 0.7),
+                price: getRealisticPrice('bottoms', 'TrendModa', bottom1Material, false, false),
                 condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
-                material: currentLanguage === 'tr' ? '%94 Polyester, %6 Elastan' : '94% Polyester, 6% Elastane',
+                material: bottom1Material,
                 brand: 'TrendModa',
                 previewTransform: { x: 0, y: 63, width: 200, height: 270 },
                 environmentalImpact: { water: 52, co2: 9, energy: 11 }
             }));
 
-            // Bottom 2 = Miav Jean (%100 geri dönüştürülmüş polyester)
+            // Bottom 2 = Miav Jean (%100 geri dönüştürülmüş polyester) - Orta marka, geri dönüşüm
+            const bottom2Material = currentLanguage === 'tr' ? '%100 Geri Dön. Polyester' : '100% Recycled Polyester';
             curatedBottoms.push(createRandomItem(1, {
                 id: 'bottoms-bottom2',
                 name: currentLanguage === 'tr' ? 'Miav Jean' : 'Miav Jeans',
                 type: clothingTypes.ECO_FRIENDLY,
                 emoji: '👖',
                 image: 'assets/images/bottoms/bottom2.png',
-                price: Math.round(averageBottomsPrice * 1.1),
+                price: getRealisticPrice('bottoms', 'Miav', bottom2Material, false, true),
                 condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
-                material: currentLanguage === 'tr' ? '%100 Geri Dön. Polyester' : '100% Recycled Polyester',
+                material: bottom2Material,
                 brand: 'Miav',
                 previewTransform: { x: 0, y: 63, width: 200, height: 270 },
                 environmentalImpact: { water: 60, co2: 4.5, energy: 10 }
             }));
 
-            // Bottom 1 Green = Closet Etek İkinci El (%94 polyester, %6 elastan)
+            // Bottom 1 Green = TrendModa Etek İkinci El (%94 polyester, %6 elastan) - Uygun marka, ikinci el
             curatedBottoms.push(createRandomItem(2, {
                 id: 'bottoms-bottom1-green',
-                name: currentLanguage === 'tr' ? 'Closet Etek 2.El' : 'Closet Skirt 2nd Hand',
+                name: currentLanguage === 'tr' ? 'TrendModa Etek' : 'TrendModa Skirt',
                 type: clothingTypes.SECONDHAND,
                 emoji: '👗',
                 image: 'assets/images/bottoms/bottom1green.png',
-                price: Math.round(averageBottomsPrice * 0.35),
+                price: getRealisticPrice('bottoms', 'TrendModa', bottom1Material, true, false),
                 condition: currentLanguage === 'tr' ? 'İyi Durumda' : 'Good Condition',
-                material: currentLanguage === 'tr' ? '%94 Polyester, %6 Elastan' : '94% Polyester, 6% Elastane',
-                brand: 'Closet',
+                material: bottom1Material,
+                brand: 'TrendModa',
                 previewTransform: { x: 0, y: 63, width: 200, height: 270 },
                 environmentalImpact: { water: 25, co2: 0.6, energy: 1 }
             }));
 
-            // Bottom 2 Brown = SHINE Jean (%90 pamuk, %6 polyester, %4 viskoz)
+            // Bottom 2 Brown = SHINE Jean (%90 pamuk, %6 polyester, %4 viskoz) - En ucuz marka
+            const bottom2BrownMaterial = currentLanguage === 'tr' ? '%90 Pamuk, %6 Polyester, %4 Viskoz' : '90% Cotton, 6% Polyester, 4% Viscose';
             curatedBottoms.push(createRandomItem(3, {
                 id: 'bottoms-bottom2-brown',
                 name: currentLanguage === 'tr' ? 'SHINE Jean' : 'SHINE Jeans',
                 type: clothingTypes.BRAND_NEW,
                 emoji: '👖',
                 image: 'assets/images/bottoms/bottom2brown.png',
-                price: Math.round(averageBottomsPrice * 0.5),
+                price: getRealisticPrice('bottoms', 'SHINE', bottom2BrownMaterial, false, false),
                 condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
-                material: currentLanguage === 'tr' ? '%90 Pamuk, %6 Polyester, %4 Viskoz' : '90% Cotton, 6% Polyester, 4% Viscose',
+                material: bottom2BrownMaterial,
                 brand: 'SHINE',
                 previewTransform: { x: 0, y: 63, width: 200, height: 270 },
                 environmentalImpact: { water: 4000, co2: 18.5, energy: 21 }
+            }));
+
+            // Bottom 1 Blue = Mengo Etek Geri Dönüşüm (%80 geri dönüştürülmüş pamuk, %20 elastan) - Pahalı marka, geri dönüşüm
+            const bottom1BlueMaterial = currentLanguage === 'tr' ? '%80 Geri Dön. Pamuk, %20 Elastan' : '80% Recycled Cotton, 20% Elastane';
+            curatedBottoms.push(createRandomItem(4, {
+                id: 'bottoms-bottom1-blue',
+                name: currentLanguage === 'tr' ? 'Mengo Etek' : 'Mengo Skirt',
+                type: clothingTypes.ECO_FRIENDLY,
+                emoji: '👗',
+                image: 'assets/images/bottoms/bottom1blue.png',
+                price: getRealisticPrice('bottoms', 'Mengo', bottom1BlueMaterial, false, true),
+                condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
+                material: bottom1BlueMaterial,
+                brand: 'Mengo',
+                previewTransform: { x: 0, y: 63, width: 200, height: 270 },
+                environmentalImpact: { water: 50, co2: 4, energy: 9 }
+            }));
+
+            // Bottom 1 Red = Oxxa Etek İkinci El (%90 pamuk, %10 akrilik) - Orta altı marka, ikinci el
+            const bottom1RedMaterial = currentLanguage === 'tr' ? '%90 Pamuk, %10 Akrilik' : '90% Cotton, 10% Acrylic';
+            curatedBottoms.push(createRandomItem(5, {
+                id: 'bottoms-bottom1-red',
+                name: currentLanguage === 'tr' ? 'Oxxa Etek' : 'Oxxa Skirt',
+                type: clothingTypes.SECONDHAND,
+                emoji: '👗',
+                image: 'assets/images/bottoms/bottom1red.png',
+                price: getRealisticPrice('bottoms', 'Oxxa', bottom1RedMaterial, true, false),
+                condition: currentLanguage === 'tr' ? 'İyi Durumda' : 'Good Condition',
+                material: bottom1RedMaterial,
+                brand: 'Oxxa',
+                previewTransform: { x: 0, y: 63, width: 200, height: 270 },
+                environmentalImpact: { water: 0, co2: 0.7, energy: 1 }
+            }));
+
+            // Bottom 1 Sarı = Zera Etek Sıfır (%100 pamuk) - Pahalı marka
+            const bottom1YellowMaterial = currentLanguage === 'tr' ? '%100 Pamuk' : '100% Cotton';
+            curatedBottoms.push(createRandomItem(6, {
+                id: 'bottoms-bottom1-yellow',
+                name: currentLanguage === 'tr' ? 'Zera Etek' : 'Zera Skirt',
+                type: clothingTypes.BRAND_NEW,
+                emoji: '👗',
+                image: 'assets/images/bottoms/bottom1yellow.png',
+                price: getRealisticPrice('bottoms', 'Zera', bottom1YellowMaterial, false, false),
+                condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
+                material: bottom1YellowMaterial,
+                brand: 'Zera',
+                previewTransform: { x: 0, y: 63, width: 200, height: 270 },
+                environmentalImpact: { water: 52, co2: 8, energy: 10 }
+            }));
+
+            // Bottom 2 Dark = Jollin's Jean İkinci El (%99 pamuk, %1 elastan) - Orta altı marka, ikinci el
+            const bottom2DarkMaterial = currentLanguage === 'tr' ? '%99 Pamuk, %1 Elastan' : '99% Cotton, 1% Elastane';
+            curatedBottoms.push(createRandomItem(7, {
+                id: 'bottoms-bottom2-dark',
+                name: currentLanguage === 'tr' ? "Jollin's Jean" : "Jollin's Jeans",
+                type: clothingTypes.SECONDHAND,
+                emoji: '👖',
+                image: 'assets/images/bottoms/bottom2_dark.png',
+                price: getRealisticPrice('bottoms', "Jollin's", bottom2DarkMaterial, true, false),
+                condition: currentLanguage === 'tr' ? 'İyi Durumda' : 'Good Condition',
+                material: bottom2DarkMaterial,
+                brand: "Jollin's",
+                previewTransform: { x: 0, y: 63, width: 200, height: 270 },
+                environmentalImpact: { water: 0, co2: 0.8, energy: 1 }
+            }));
+
+            // Bottom 2 Black = TrendModa Jean Sıfır (%100 pamuk) - Uygun marka
+            const bottom2BlackMaterial = currentLanguage === 'tr' ? '%100 Pamuk' : '100% Cotton';
+            curatedBottoms.push(createRandomItem(8, {
+                id: 'bottoms-bottom2-black',
+                name: currentLanguage === 'tr' ? 'TrendModa Jean' : 'TrendModa Jeans',
+                type: clothingTypes.BRAND_NEW,
+                emoji: '👖',
+                image: 'assets/images/bottoms/bottom2black.png',
+                price: getRealisticPrice('bottoms', 'TrendModa', bottom2BlackMaterial, false, false),
+                condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
+                material: bottom2BlackMaterial,
+                brand: 'TrendModa',
+                previewTransform: { x: 0, y: 63, width: 200, height: 270 },
+                environmentalImpact: { water: 52, co2: 8, energy: 10 }
+            }));
+
+            // Bottom 2 Green = Vokka Jean Sıfır (%20 geri dönüştürülmüş pamuk, %70 pamuk, %10 elastan) - En pahalı marka, geri dönüşüm
+            const bottom2GreenMaterial = currentLanguage === 'tr' ? '%20 Geri Dön. Pamuk, %70 Pamuk, %10 Elastan' : '20% Recycled Cotton, 70% Cotton, 10% Elastane';
+            curatedBottoms.push(createRandomItem(9, {
+                id: 'bottoms-bottom2-green',
+                name: currentLanguage === 'tr' ? 'Vokka Jean' : 'Vokka Jeans',
+                type: clothingTypes.ECO_FRIENDLY,
+                emoji: '👖',
+                image: 'assets/images/bottoms/bottom2green.png',
+                price: getRealisticPrice('bottoms', 'Vokka', bottom2GreenMaterial, false, true),
+                condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
+                material: bottom2GreenMaterial,
+                brand: 'Vokka',
+                previewTransform: { x: 0, y: 63, width: 200, height: 270 },
+                environmentalImpact: { water: 55, co2: 5, energy: 9 }
             }));
 
             items[category] = curatedBottoms;
@@ -731,77 +961,95 @@ function generateClothingItems() {
                 ? Math.round(((range.min + range.max) / 2) / 10) * 10
                 : 140;
 
-            // Shoes 1 = Dididos Ayakkabı (suni deri, kauçuk)
+            // Shoes 1 = Dididos Ayakkabı (suni deri, kauçuk) - Az pahalı marka
+            const shoes1Material = currentLanguage === 'tr' ? 'Suni Deri, Kauçuk' : 'Synthetic Leather, Rubber';
             curatedShoes.push(createRandomItem(0, {
                 id: 'shoes-1',
                 name: currentLanguage === 'tr' ? 'Dididos Spor Ayakkabı' : 'Dididos Sneakers',
                 type: clothingTypes.BRAND_NEW,
                 emoji: '👟',
                 image: 'assets/images/shoes/shoes1.png',
-                price: Math.round(averageShoesPrice * 1.2),
+                price: getRealisticPrice('shoes', 'Dididos', shoes1Material, false, false),
                 condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
-                material: currentLanguage === 'tr' ? 'Suni Deri, Kauçuk' : 'Synthetic Leather, Rubber',
+                material: shoes1Material,
                 brand: 'Dididos',
                 previewTransform: { x: -102.4, y: 59, width: 405, height: 280 },
                 environmentalImpact: { water: 100, co2: 15, energy: 21 }
             }));
 
-            // Shoes 1 Blue = Dididos Ayakkabı Mavi İkinci El (suni deri, kauçuk)
+            // Shoes 1 Blue = Dididos Ayakkabı Mavi Sıfır (%50 geri dönüştürülmüş kauçuk, %50 suni deri) - Az pahalı marka, geri dönüşüm
+            const shoes1BlueMaterial = currentLanguage === 'tr' ? '%50 Geri Dön. Kauçuk, %50 Suni Deri' : '50% Recycled Rubber, 50% Synthetic Leather';
             curatedShoes.push(createRandomItem(1, {
                 id: 'shoes-1-blue',
-                name: currentLanguage === 'tr' ? 'Dididos Spor Ayakkabı Mavi 2.El' : 'Dididos Sneakers Blue 2nd Hand',
-                type: clothingTypes.SECONDHAND,
+                name: currentLanguage === 'tr' ? 'Dididos Spor Ayakkabı Mavi' : 'Dididos Sneakers Blue',
+                type: clothingTypes.BRAND_NEW,
                 emoji: '👟',
                 image: 'assets/images/shoes/shoes1blue.png',
-                price: Math.round(averageShoesPrice * 0.5),
-                condition: currentLanguage === 'tr' ? 'İyi Durumda' : 'Good Condition',
-                material: currentLanguage === 'tr' ? 'Suni Deri, Kauçuk' : 'Synthetic Leather, Rubber',
+                price: getRealisticPrice('shoes', 'Dididos', shoes1BlueMaterial, false, true),
+                condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
+                material: shoes1BlueMaterial,
                 brand: 'Dididos',
                 previewTransform: { x: -102.4, y: 59, width: 405, height: 280 },
                 environmentalImpact: { water: 0, co2: 0.8, energy: 1 }
             }));
 
-            // Shoes 1 Green = Dididos Ayakkabı Yeşil (suni deri, kauçuk)
+            // Shoes 1 Green = Dididos Ayakkabı Yeşil (suni deri, kauçuk) - Az pahalı marka
             curatedShoes.push(createRandomItem(2, {
                 id: 'shoes-1-green',
                 name: currentLanguage === 'tr' ? 'Dididos Spor Ayakkabı Yeşil' : 'Dididos Sneakers Green',
                 type: clothingTypes.BRAND_NEW,
                 emoji: '👟',
                 image: 'assets/images/shoes/shoes1green.png',
-                price: Math.round(averageShoesPrice * 1.2),
+                price: getRealisticPrice('shoes', 'Dididos', shoes1Material, false, false),
                 condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
-                material: currentLanguage === 'tr' ? 'Suni Deri, Kauçuk' : 'Synthetic Leather, Rubber',
+                material: shoes1Material,
                 brand: 'Dididos',
                 previewTransform: { x: -102.4, y: 59, width: 405, height: 280 },
                 environmentalImpact: { water: 100, co2: 15, energy: 21 }
             }));
 
-            // Shoes 2 Black = NINE EAST Ayakkabı (%100 deri)
+            // Shoes 2 Black = NINE EAST Ayakkabı (%100 deri) - Pahalı marka, premium malzeme (deri)
+            const shoes2BlackMaterial = currentLanguage === 'tr' ? '%100 Deri' : '100% Leather';
             curatedShoes.push(createRandomItem(3, {
                 id: 'shoes-2-black',
                 name: currentLanguage === 'tr' ? 'NINE EAST Ayakkabı Siyah' : 'NINE EAST Shoes Black',
                 type: clothingTypes.BRAND_NEW,
                 emoji: '👞',
                 image: 'assets/images/shoes/shoes2black.png',
-                price: Math.round(averageShoesPrice * 2.0),
+                price: getRealisticPrice('shoes', 'NINE EAST', shoes2BlackMaterial, false, false),
                 condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
-                material: currentLanguage === 'tr' ? '%100 Deri' : '100% Leather',
+                material: shoes2BlackMaterial,
                 brand: 'NINE EAST',
                 previewTransform: { x: -102.4, y: 59, width: 405, height: 280 },
                 environmentalImpact: { water: 8450, co2: 48, energy: 35 }
             }));
 
-            // Shoes 2 Brown = NINE EAST Ayakkabı Kahverengi (%100 deri)
+            // Shoes 2 Brown = NINE EAST Ayakkabı Kahverengi (%100 deri) - Pahalı marka, premium malzeme (deri)
             curatedShoes.push(createRandomItem(4, {
                 id: 'shoes-2-brown',
                 name: currentLanguage === 'tr' ? 'NINE EAST Ayakkabı Kahve' : 'NINE EAST Shoes Brown',
                 type: clothingTypes.BRAND_NEW,
                 emoji: '👞',
                 image: 'assets/images/shoes/shoes2brown.png',
-                price: Math.round(averageShoesPrice * 2.0),
+                price: getRealisticPrice('shoes', 'NINE EAST', shoes2BlackMaterial, false, false),
                 condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
-                material: currentLanguage === 'tr' ? '%100 Deri' : '100% Leather',
+                material: shoes2BlackMaterial,
                 brand: 'NINE EAST',
+                previewTransform: { x: -102.4, y: 59, width: 405, height: 280 },
+                environmentalImpact: { water: 8450, co2: 48, energy: 35 }
+            }));
+
+            // Shoes 2 Maroon = Ertuğrul Kundura Ayakkabı Sıfır (%100 deri) - Pahalı marka, premium malzeme (deri)
+            curatedShoes.push(createRandomItem(5, {
+                id: 'shoes-2-maroon',
+                name: currentLanguage === 'tr' ? 'Ertuğrul Kundura Ayakkabı' : 'Ertuğrul Kundura Shoes',
+                type: clothingTypes.BRAND_NEW,
+                emoji: '👞',
+                image: 'assets/images/shoes/shoes2maroon.png',
+                price: getRealisticPrice('shoes', 'Ertuğrul Kundura', shoes2BlackMaterial, false, false),
+                condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
+                material: shoes2BlackMaterial,
+                brand: 'Ertuğrul Kundura',
                 previewTransform: { x: -102.4, y: 59, width: 405, height: 280 },
                 environmentalImpact: { water: 8450, co2: 48, energy: 35 }
             }));
@@ -838,6 +1086,7 @@ const scoreSection = document.querySelector('.score-section');
 const impactSection = document.querySelector('.impact-section');
 const itemDisplay = {
     placeholder: document.querySelector('.item-placeholder'),
+    badge: document.querySelector('.item-badge'),
     name: document.querySelector('.item-name'),
     details: {
         price: document.querySelector('[data-detail="price"]'),
@@ -847,15 +1096,28 @@ const itemDisplay = {
     }
 };
 
-const historyElements = {
-    list: document.getElementById('sessionHistoryList'),
-    exportButton: document.getElementById('exportHistoryBtn')
-};
-
 // Screen Navigation
 function showScreen(screenName) {
     Object.values(screens).forEach(screen => screen.classList.remove('active'));
     screens[screenName].classList.add('active');
+}
+
+// Badge güncelleme fonksiyonu
+function updateItemBadge(item) {
+    if (!itemDisplay.badge) return;
+    
+    if (item.type === clothingTypes.BRAND_NEW) {
+        itemDisplay.badge.textContent = '🏷️';
+        itemDisplay.badge.style.display = 'flex';
+    } else if (item.type === clothingTypes.SECONDHAND) {
+        itemDisplay.badge.textContent = '🥈';
+        itemDisplay.badge.style.display = 'flex';
+    } else if (item.type === clothingTypes.ECO_FRIENDLY) {
+        itemDisplay.badge.textContent = '♻️';
+        itemDisplay.badge.style.display = 'flex';
+    } else {
+        itemDisplay.badge.style.display = 'none';
+    }
 }
 
 // Update Clothing Display
@@ -866,14 +1128,29 @@ function updateClothingDisplay() {
     // Debug log - kıyafet bilgilerini konsola yazdır
     console.log('Current Item:', currentItem.name, 'Image:', currentItem.image);
 
+    // Badge'i güncelle
+    updateItemBadge(currentItem);
+
     if (currentItem.image && currentItem.image !== null) {
         // Kategori bazlı class ekleme (top, bottom, shoes için ayrı stiller)
         const categoryClass = `item-image item-image-${gameState.currentCategory}`;
-        itemDisplay.placeholder.innerHTML = `<img src="${currentItem.image}" alt="${currentItem.name}" class="${categoryClass}" onerror="console.error('Image load error:', this.src)">`;
+        const existingBadge = itemDisplay.placeholder.querySelector('.item-badge');
+        const badgeHTML = existingBadge ? existingBadge.outerHTML : '<span class="item-badge"></span>';
+        itemDisplay.placeholder.innerHTML = `<img src="${currentItem.image}" alt="${currentItem.name}" class="${categoryClass}" onerror="console.error('Image load error:', this.src)">${badgeHTML}`;
         itemDisplay.placeholder.classList.add('has-image');
+        
+        // Badge referansını yeniden al ve güncelle
+        itemDisplay.badge = itemDisplay.placeholder.querySelector('.item-badge');
+        updateItemBadge(currentItem);
     } else {
-        itemDisplay.placeholder.textContent = currentItem.emoji || '';
+        const existingBadge = itemDisplay.placeholder.querySelector('.item-badge');
+        const badgeHTML = existingBadge ? existingBadge.outerHTML : '<span class="item-badge"></span>';
+        itemDisplay.placeholder.innerHTML = `${badgeHTML}${currentItem.emoji || ''}`;
         itemDisplay.placeholder.classList.remove('has-image');
+        
+        // Badge referansını yeniden al ve güncelle
+        itemDisplay.badge = itemDisplay.placeholder.querySelector('.item-badge');
+        updateItemBadge(currentItem);
     }
     itemDisplay.name.textContent = currentItem.name;
     if (itemDisplay.details) {
@@ -1021,12 +1298,12 @@ function updatePreviewCharacterVisuals() {
             `;
         } else {
             // Görsel yoksa emoji göster
-            const color = getColorForType(item.type);
-            previewLayers.bottoms.innerHTML = `
-                <polygon points="70,200 75,280 95,280 100,200" fill="${color}" opacity="0.7"/>
-                <polygon points="100,200 105,280 125,280 130,200" fill="${color}" opacity="0.7"/>
-                <text x="100" y="240" text-anchor="middle" font-size="24">${item.emoji}</text>
-            `;
+        const color = getColorForType(item.type);
+        previewLayers.bottoms.innerHTML = `
+            <polygon points="70,200 75,280 95,280 100,200" fill="${color}" opacity="0.7"/>
+            <polygon points="100,200 105,280 125,280 130,200" fill="${color}" opacity="0.7"/>
+            <text x="100" y="240" text-anchor="middle" font-size="24">${item.emoji}</text>
+        `;
         }
     }
 
@@ -1046,12 +1323,12 @@ function updatePreviewCharacterVisuals() {
             `;
         } else {
             // Görsel yoksa emoji göster
-            const color = getColorForType(item.type);
-            previewLayers.shoes.innerHTML = `
-                <ellipse cx="75" cy="285" rx="15" ry="8" fill="${color}" opacity="0.8"/>
-                <ellipse cx="125" cy="285" rx="15" ry="8" fill="${color}" opacity="0.8"/>
-                <text x="100" y="295" text-anchor="middle" font-size="20">${item.emoji}</text>
-            `;
+        const color = getColorForType(item.type);
+        previewLayers.shoes.innerHTML = `
+            <ellipse cx="75" cy="285" rx="15" ry="8" fill="${color}" opacity="0.8"/>
+            <ellipse cx="125" cy="285" rx="15" ry="8" fill="${color}" opacity="0.8"/>
+            <text x="100" y="295" text-anchor="middle" font-size="20">${item.emoji}</text>
+        `;
         }
     }
 }
@@ -1122,29 +1399,19 @@ function displayResults() {
     if (scoreActions) {
         scoreActions.classList.remove('active');
     }
-    if (scoreSection) scoreSection.classList.remove('hidden');
-    if (impactSection) impactSection.classList.add('hidden');
+    // Direkt impact screen'e geç
+    if (scoreSection) scoreSection.classList.add('hidden');
+    if (impactSection) impactSection.classList.remove('hidden');
 
     const impact = calculateImpact();
-    recordSession(impact);
     
     // Google Sheets'e kaydet (arka planda çalışır)
     saveToGoogleSheets(impact);
 
-    // Show initial score with random number
-    const randomScore = Math.floor(Math.random() * 900000) + 100000;
-    document.querySelector('.score-number').textContent = randomScore.toString().split('').join(' ');
-    document.getElementById('initialScore').classList.add('active');
-
-    // After 2 seconds, transition to impact screen
-    setTimeout(() => {
-        document.getElementById('initialScore').classList.remove('active');
-
-        setTimeout(() => {
             // Update impact data
-            document.getElementById('waterUsed').textContent = impact.waterUsed.toLocaleString();
-            document.getElementById('co2Emitted').textContent = impact.co2Emitted;
-            document.getElementById('energyUsed').textContent = impact.energyUsed.toLocaleString();
+    document.getElementById('waterUsed').textContent = impact.waterUsed.toLocaleString();
+    document.getElementById('co2Emitted').textContent = impact.co2Emitted;
+    document.getElementById('energyUsed').textContent = impact.energyUsed.toLocaleString();
             document.getElementById('ecoRating').textContent = impact.ecoRating;
             document.getElementById('impactText').textContent = impact.message;
 
@@ -1156,14 +1423,10 @@ function displayResults() {
 
             // Show impact screen
             document.getElementById('impactScreen').classList.add('active');
-            if (scoreSection) scoreSection.classList.add('hidden');
-            if (impactSection) impactSection.classList.remove('hidden');
 
             if (scoreActions) {
                 scoreActions.classList.add('active');
             }
-        }, 300);
-    }, 2000);
 }
 
 // Event Listeners
@@ -1261,32 +1524,20 @@ buttons.playAgain.addEventListener('click', () => {
     budgetState.total = 1000;
 
     // Reset score screen
-    document.getElementById('initialScore').classList.remove('active');
     document.getElementById('impactScreen').classList.remove('active');
 
     const scoreActions = document.querySelector('.score-actions');
     if (scoreActions) {
         scoreActions.classList.remove('active');
     }
-    if (scoreSection) scoreSection.classList.remove('hidden');
-    if (impactSection) impactSection.classList.add('hidden');
+    if (scoreSection) scoreSection.classList.add('hidden');
+    if (impactSection) impactSection.classList.remove('hidden');
 
     // Return to language screen to allow language change
     showScreen('languageScreen');
     updateBudgetUI();
 });
 
-if (historyElements.exportButton) {
-    historyElements.exportButton.addEventListener('click', () => {
-        const history = loadSessionHistory();
-        if (!history.length) {
-            alert(translations[currentLanguage].emptyHistory);
-            return;
-        }
-        const csvContent = buildHistoryCSV(history);
-        downloadCSV(csvContent, `dressup-history-${Date.now()}.csv`);
-    });
-}
 
 // Language Selection
 const languageButtons = document.querySelectorAll('.language-btn');
@@ -1296,7 +1547,6 @@ languageButtons.forEach(btn => {
         clothingData = generateClothingItems();
         translateUI();
         updateBudgetUI();
-        renderSessionHistory();
         showScreen('homepage');
     });
 });
@@ -1360,5 +1610,3 @@ document.addEventListener('keydown', (e) => {
         }
     }
 });
-
-renderSessionHistory();
