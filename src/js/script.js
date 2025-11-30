@@ -3,7 +3,7 @@
 // ==========================================
 // Bu URL'yi kendi Google Apps Script Web App URL'niz ile değiştirin
 // Nasıl alınır: README.md dosyasındaki "Google Sheets Entegrasyonu" bölümüne bakın
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxwe4Kylx2VTs1bdlz6X6uZnxQFo9RvmV-Cz_ZJ7o9Pa911hI31KAyFhOQZFGESI2lrLw/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-a59SuK_QsRu852-HBWO02JyNiGmffRFmvKEY_4ydMSg0FWIXD7Q7HooC3thWAUQ4HQ/exec";
 
 // Google Sheets'e veri gönderme fonksiyonu
 async function saveToGoogleSheets(impact) {
