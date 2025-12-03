@@ -57,7 +57,7 @@ async function saveToGoogleSheets(impact) {
 // Translations
 const translations = {
     en: {
-        welcomeTitle: "Welcome to Dress Up Gaame",
+        welcomeTitle: "Welcome to Dress Up Game",
         welcomeText: "Dress your character!",
         startGame: "Start Game",
         categoryAccessories: "Accessories",
@@ -139,8 +139,8 @@ const translations = {
         shoesNames: ['Sneakers', 'Boots', 'Sandals', 'Loafers', 'Flats', 'Heels', 'Oxfords', 'Slippers', 'Mules', 'Espadrilles']
     },
     tr: {
-        welcomeTitle: "Dress Up Gaame oyununa hoş geldiniz",
-        welcomeText: "Karakterinizi istediğiniz gibi giydirin!",
+        welcomeTitle: "Dress Up Game oyununa hoş geldiniz",
+        welcomeText: "💰 Bütçeyi aşmadan tarzınızı yansıtacak kombinler yapın!\n🛒 Kombinlerinizin gerçek hayattaki giyim deneyiminizi yansıttığından emin olun.\n📝 Oyundan sonra geri bildirim formunu doldurmayı unutmayın.\n🍀 İyi şanslar!",
         startGame: "Oyuna Başla",
         categoryAccessories: "Aksesuarlar",
         categoryOuterwear: "Üst Giyim",
@@ -631,7 +631,7 @@ function generateClothingItems() {
                 emoji: '👕',
                 image: 'assets/images/tops/top1black.png',
                 price: getRealisticPrice('outerwear', 'Mengo', top1BlackMaterial, true, false),
-                condition: currentLanguage === 'tr' ? 'İyi Durumda' : 'Good Condition',
+                condition: currentLanguage === 'tr' ? 'İkinci El' : 'Good Condition',
                 material: top1BlackMaterial,
                 brand: 'Mengo',
                 previewTransform: { x: 0, y: 63, width: 200, height: 270 },
@@ -711,7 +711,7 @@ function generateClothingItems() {
                 emoji: '👚',
                 image: 'assets/images/tops/top2green.png',
                 price: getRealisticPrice('outerwear', "Jollin's", top2GreenMaterial, true, false),
-                condition: currentLanguage === 'tr' ? 'İyi Durumda' : 'Good Condition',
+                condition: currentLanguage === 'tr' ? 'İkinci El' : 'Good Condition',
                 material: top2GreenMaterial,
                 brand: "Jollin's",
                 previewTransform: { x: 0, y: 63, width: 200, height: 270 },
@@ -743,7 +743,7 @@ function generateClothingItems() {
                 emoji: '👔',
                 image: 'assets/images/tops/top3green.png',
                 price: getRealisticPrice('outerwear', 'Oxxa', top3GreenMaterial, true, false),
-                condition: currentLanguage === 'tr' ? 'İyi Durumda' : 'Good Condition',
+                condition: currentLanguage === 'tr' ? 'İkinci El' : 'Good Condition',
                 material: top3GreenMaterial,
                 brand: 'Oxxa',
                 previewTransform: { x: 0, y: 63, width: 200, height: 270 },
@@ -759,7 +759,7 @@ function generateClothingItems() {
                 emoji: '👔',
                 image: 'assets/images/tops/top3purple.png',
                 price: getRealisticPrice('outerwear', 'H&W', top3PurpleMaterial, true, false),
-                condition: currentLanguage === 'tr' ? 'İyi Durumda' : 'Good Condition',
+                condition: currentLanguage === 'tr' ? 'İkinci El' : 'Good Condition',
                 material: top3PurpleMaterial,
                 brand: 'H&W',
                 previewTransform: { x: 0, y: 63, width: 200, height: 270 },
@@ -832,7 +832,7 @@ function generateClothingItems() {
                 emoji: '👗',
                 image: 'assets/images/bottoms/bottom1green.png',
                 price: getRealisticPrice('bottoms', 'TrendModa', bottom1Material, true, false),
-                condition: currentLanguage === 'tr' ? 'İyi Durumda' : 'Good Condition',
+                condition: currentLanguage === 'tr' ? 'İkinci El' : 'Good Condition',
                 material: bottom1Material,
                 brand: 'TrendModa',
                 previewTransform: { x: 0, y: 63, width: 200, height: 270 },
@@ -880,7 +880,7 @@ function generateClothingItems() {
                 emoji: '👗',
                 image: 'assets/images/bottoms/bottom1red.png',
                 price: getRealisticPrice('bottoms', 'Oxxa', bottom1RedMaterial, true, false),
-                condition: currentLanguage === 'tr' ? 'İyi Durumda' : 'Good Condition',
+                condition: currentLanguage === 'tr' ? 'İkinci El' : 'Good Condition',
                 material: bottom1RedMaterial,
                 brand: 'Oxxa',
                 previewTransform: { x: 0, y: 63, width: 200, height: 270 },
@@ -912,7 +912,7 @@ function generateClothingItems() {
                 emoji: '👖',
                 image: 'assets/images/bottoms/bottom2_dark.png',
                 price: getRealisticPrice('bottoms', "Jollin's", bottom2DarkMaterial, true, false),
-                condition: currentLanguage === 'tr' ? 'İyi Durumda' : 'Good Condition',
+                condition: currentLanguage === 'tr' ? 'İkinci El' : 'Good Condition',
                 material: bottom2DarkMaterial,
                 brand: "Jollin's",
                 previewTransform: { x: 0, y: 63, width: 200, height: 270 },
@@ -1098,8 +1098,17 @@ const itemDisplay = {
 
 // Screen Navigation
 function showScreen(screenName) {
-    Object.values(screens).forEach(screen => screen.classList.remove('active'));
-    screens[screenName].classList.add('active');
+    Object.values(screens).forEach(screen => {
+        if (screen) {
+            screen.classList.remove('active');
+        }
+    });
+    
+    if (screens[screenName]) {
+        screens[screenName].classList.add('active');
+    } else {
+        console.error(`Screen ${screenName} not found!`);
+    }
 }
 
 // Badge güncelleme fonksiyonu
@@ -1110,7 +1119,7 @@ function updateItemBadge(item) {
         itemDisplay.badge.textContent = '🏷️';
         itemDisplay.badge.style.display = 'flex';
     } else if (item.type === clothingTypes.SECONDHAND) {
-        itemDisplay.badge.textContent = '🥈';
+        itemDisplay.badge.textContent = '2️⃣';
         itemDisplay.badge.style.display = 'flex';
     } else if (item.type === clothingTypes.ECO_FRIENDLY) {
         itemDisplay.badge.textContent = '♻️';
@@ -1122,14 +1131,27 @@ function updateItemBadge(item) {
 
 // Update Clothing Display
 function updateClothingDisplay() {
-    const items = clothingData[gameState.currentCategory];
-    const currentItem = items[gameState.currentIndex];
+    try {
+        // Validate data exists
+        if (!clothingData || !clothingData[gameState.currentCategory]) {
+            console.error('Clothing data not found for category:', gameState.currentCategory);
+            return;
+        }
+        
+        const items = clothingData[gameState.currentCategory];
+        if (!items || items.length === 0) {
+            console.error('No items found for category:', gameState.currentCategory);
+            return;
+        }
+        
+        const currentItem = items[gameState.currentIndex];
+        if (!currentItem) {
+            console.error('Current item not found at index:', gameState.currentIndex);
+            return;
+        }
 
-    // Debug log - kıyafet bilgilerini konsola yazdır
-    console.log('Current Item:', currentItem.name, 'Image:', currentItem.image);
-
-    // Badge'i güncelle
-    updateItemBadge(currentItem);
+        // Badge'i güncelle
+        updateItemBadge(currentItem);
 
     if (currentItem.image && currentItem.image !== null) {
         // Kategori bazlı class ekleme (top, bottom, shoes için ayrı stiller)
@@ -1152,33 +1174,45 @@ function updateClothingDisplay() {
         itemDisplay.badge = itemDisplay.placeholder.querySelector('.item-badge');
         updateItemBadge(currentItem);
     }
-    itemDisplay.name.textContent = currentItem.name;
-    if (itemDisplay.details) {
-        if (itemDisplay.details.price) {
-            itemDisplay.details.price.textContent = formatPrice(currentItem.price);
+        // Validate display elements exist
+        if (!itemDisplay.placeholder || !itemDisplay.name) {
+            console.error('Required display elements not found');
+            return;
         }
-        if (itemDisplay.details.condition) {
-            itemDisplay.details.condition.textContent = currentItem.condition || '-';
+
+        itemDisplay.name.textContent = currentItem.name;
+        if (itemDisplay.details) {
+            if (itemDisplay.details.price) {
+                itemDisplay.details.price.textContent = formatPrice(currentItem.price);
+            }
+            if (itemDisplay.details.condition) {
+                itemDisplay.details.condition.textContent = currentItem.condition || '-';
+            }
+            if (itemDisplay.details.material) {
+                itemDisplay.details.material.textContent = currentItem.material || '-';
+            }
+            if (itemDisplay.details.brand) {
+                itemDisplay.details.brand.textContent = currentItem.brand || '-';
+            }
         }
-        if (itemDisplay.details.material) {
-            itemDisplay.details.material.textContent = currentItem.material || '-';
+
+        // Update navigation buttons
+        if (buttons.prev) buttons.prev.disabled = gameState.currentIndex === 0;
+        if (buttons.next) buttons.next.disabled = gameState.currentIndex === items.length - 1;
+
+        // Update select button state
+        if (buttons.select) {
+            const isSelected = gameState.selectedItems[gameState.currentCategory]?.id === currentItem.id;
+            buttons.select.textContent = isSelected ? translations[currentLanguage].selected : translations[currentLanguage].select;
+            buttons.select.classList.toggle('selected', isSelected);
         }
-        if (itemDisplay.details.brand) {
-            itemDisplay.details.brand.textContent = currentItem.brand || '-';
-        }
+
+        // Update category button to show selection
+        updateCategoryButtons();
+    } catch (error) {
+        console.error('Error in updateClothingDisplay:', error);
+        throw error;
     }
-
-    // Update navigation buttons
-    buttons.prev.disabled = gameState.currentIndex === 0;
-    buttons.next.disabled = gameState.currentIndex === items.length - 1;
-
-    // Update select button state
-    const isSelected = gameState.selectedItems[gameState.currentCategory]?.id === currentItem.id;
-    buttons.select.textContent = isSelected ? translations[currentLanguage].selected : translations[currentLanguage].select;
-    buttons.select.classList.toggle('selected', isSelected);
-
-    // Update category button to show selection
-    updateCategoryButtons();
 }
 
 // Update Category Buttons
@@ -1431,10 +1465,22 @@ function displayResults() {
 
 // Event Listeners
 buttons.start.addEventListener('click', () => {
-    initializeBudget();
-    showScreen('gameScreen');
-    updateClothingDisplay();
-    updateCharacterPreview();
+    try {
+        // Fallback if clothingData is missing
+        if (!clothingData) {
+            console.warn('Clothing data missing on start, regenerating...');
+            clothingData = generateClothingItems();
+            translateUI();
+        }
+        
+        initializeBudget();
+        showScreen('gameScreen');
+        updateClothingDisplay();
+        updateCharacterPreview();
+    } catch (error) {
+        console.error('Error starting game:', error);
+        alert('Oyun başlatılırken bir hata oluştu. Lütfen sayfayı yenileyin.\nHata: ' + error.message);
+    }
 });
 
 categoryButtons.forEach(btn => {

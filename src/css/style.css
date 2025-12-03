@@ -156,47 +156,62 @@ button {
 #homepage {
     text-align: center;
     overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
 }
 
 .welcome-title {
-    font-size: 36px;
+    font-size: clamp(24px, 4vw, 36px);
     color: var(--primary-dark);
-    margin-bottom: 10px; /* Avatar büyüdüğü için margin azaltıldı */
+    margin-bottom: 8px;
     font-weight: 700;
+    flex-shrink: 0;
 }
 
 .welcome-text {
-    font-size: 18px;
+    font-size: clamp(14px, 2vw, 18px);
     color: var(--text-secondary);
-    margin-bottom: 20px; /* Avatar büyüdüğü için margin azaltıldı */
-    max-width: 600px;
+    margin-bottom: 20px;
+    max-width: 90%;
+    white-space: pre-line;
+    text-align: center;
+    line-height: 1.8;
+    flex-shrink: 0;
 }
 
 .character-container {
-    margin-bottom: 30px;
+    margin-bottom: 10px;
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 500px; /* Avatar için yeterli alan sağlar */
+    flex: 0 0 auto;
+    min-height: 0;
+    max-height: 45vh;
 }
 
 .character {
-    filter: drop-shadow(6px 6px 12px var(--shadow-color-strong)); /* Gölge de büyütüldü */
+    filter: drop-shadow(6px 6px 12px var(--shadow-color-strong));
     display: block;
     margin: 0 auto;
-    transition: transform 0.3s ease; /* Hover efekti için animasyon */
+    transition: transform 0.3s ease;
 }
 
 .character:hover {
-    transform: scale(1.05); /* Hover'da hafif büyüme efekti */
+    transform: scale(1.03);
 }
 
 .hero-avatar {
-    width: 600px; /* 2 katına çıkarıldı - 300px'den 600px'e */
-    height: 1200px; /* 2 katına çıkarıldı - 600px'den 1200px'e */
+    width: auto;
+    height: 100%;
+    max-height: 100%;
     object-fit: contain;
-    max-width: 90vw; /* Ekran genişliğini aşmaması için */
-    max-height: 70vh; /* Ekran yüksekliğini aşmaması için */
+    max-width: 90vw;
 }
 
 .btn-primary {
@@ -780,17 +795,16 @@ button {
 /* Score Screen */
 #scoreScreen {
     background: radial-gradient(circle at top right, var(--score-bg-start) 0%, var(--score-bg-mid) 45%, var(--score-bg-end) 100%);
-    padding: 10px; /* Padding azaltıldı - içeriğin sığması için */
+    padding: 10px;
     box-sizing: border-box;
-    overflow-y: auto; /* Dikey kaydırma aktif */
-    overflow-x: hidden; /* Yatay kaydırma kapalı */
+    overflow-y: auto;
+    overflow-x: hidden;
     position: relative;
-    display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start; /* Üstten başla */
-    width: 100vw; /* Tam ekran genişliği */
-    height: 100vh; /* Tam ekran yüksekliği */
+    justify-content: flex-start;
+    width: 100vw;
+    height: 100vh;
 }
 
 /* Score screen için scrollbar görünür yap */
@@ -1350,7 +1364,7 @@ button {
         overflow-y: auto;
         overflow-x: hidden;
     }
-    
+
     .item-badge {
         font-size: 20px;
         width: 32px;
@@ -1443,11 +1457,15 @@ button {
     }
 
     .welcome-title {
-        font-size: 24px;
+        font-size: clamp(20px, 5vw, 28px);
     }
 
     .welcome-text {
-        font-size: 16px;
+        font-size: clamp(12px, 3vw, 16px);
+        white-space: pre-line;
+        text-align: center;
+        max-width: 95%;
+        line-height: 1.5;
     }
 
     .btn-primary {
@@ -1455,13 +1473,13 @@ button {
         font-size: 20px;
     }
 
-    .character {
-        width: 300px; /* Mobilde 2 katına çıkarıldı - 150px'den 300px'e */
-        height: 600px; /* Mobilde 2 katına çıkarıldı - 300px'den 600px'e */
-        margin: 0 auto;
-        display: block;
-        max-width: 85vw; /* Mobil ekran genişliğini aşmaması için */
-        max-height: 50vh; /* Mobil ekran yüksekliğini aşmaması için */
+    .character-container {
+        max-height: 40vh;
+    }
+
+    .hero-avatar {
+        max-height: 100%;
+        max-width: 85vw;
     }
 
     .category-btn {
