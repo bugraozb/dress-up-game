@@ -590,15 +590,15 @@ function generateClothingItems() {
                 environmentalImpact: { water: 4150, co2: 15, energy: 18 }
             }));
 
-            // Top 1 Gray = H&W Kazak (%73 akrilik, %25 polyester, %2 elastan) - Orta marka
+            // Top 1 Gray = H&W Bluz (%73 akrilik, %25 polyester, %2 elastan) - Orta marka
             const top1GrayMaterial = currentLanguage === 'tr' ? '%73 Akrilik, %25 Polyester, %2 Elastan' : '73% Acrylic, 25% Polyester, 2% Elastane';
             curatedOuterwear.push(createRandomItem(4, {
                 id: 'outerwear-top1-gray',
-                name: currentLanguage === 'tr' ? 'H&W Kazak' : 'H&W Sweater',
+                name: currentLanguage === 'tr' ? 'H&W Bluz' : 'H&W Blouse',
                 type: clothingTypes.BRAND_NEW,
                 emoji: '👚',
                 image: 'assets/images/tops/top1gray.png',
-                price: getRealisticPrice('outerwear', 'H&W', top1GrayMaterial, false, false),
+                price: 180, // Sabit fiyat
                 condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
                 material: top1GrayMaterial,
                 brand: 'H&W',
@@ -606,15 +606,15 @@ function generateClothingItems() {
                 environmentalImpact: { water: 100, co2: 14, energy: 23 }
             }));
 
-            // Top 2 Yellow = H&W Bluz (%92 viskoz, %8 elastan) - Orta marka
+            // Top 2 Yellow = H&W Kazak (%92 viskoz, %8 elastan) - Orta marka
             const top2YellowMaterial = currentLanguage === 'tr' ? '%92 Viskoz, %8 Elastan' : '92% Viscose, 8% Elastane';
             curatedOuterwear.push(createRandomItem(5, {
                 id: 'outerwear-top2-yellow',
-                name: currentLanguage === 'tr' ? 'H&W Bluz' : 'H&W Blouse',
+                name: currentLanguage === 'tr' ? 'H&W Kazak' : 'H&W Sweater',
                 type: clothingTypes.BRAND_NEW,
                 emoji: '👕',
                 image: 'assets/images/tops/top2yellow.png',
-                price: getRealisticPrice('outerwear', 'H&W', top2YellowMaterial, false, false),
+                price: 210, // Sabit fiyat
                 condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
                 material: top2YellowMaterial,
                 brand: 'H&W',
@@ -630,7 +630,7 @@ function generateClothingItems() {
                 type: clothingTypes.SECONDHAND,
                 emoji: '👕',
                 image: 'assets/images/tops/top1black.png',
-                price: getRealisticPrice('outerwear', 'Mengo', top1BlackMaterial, true, false),
+                price: 100, // Sabit fiyat
                 condition: currentLanguage === 'tr' ? 'İkinci El' : 'Good Condition',
                 material: top1BlackMaterial,
                 brand: 'Mengo',
@@ -662,7 +662,7 @@ function generateClothingItems() {
                 type: clothingTypes.BRAND_NEW,
                 emoji: '👕',
                 image: 'assets/images/tops/top1maroon.png',
-                price: getRealisticPrice('outerwear', 'TIMU', top1MaroonMaterial, false, false),
+                price: 95, // Sabit fiyat
                 condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
                 material: top1MaroonMaterial,
                 brand: 'TIMU',
@@ -742,7 +742,7 @@ function generateClothingItems() {
                 type: clothingTypes.SECONDHAND,
                 emoji: '👔',
                 image: 'assets/images/tops/top3green.png',
-                price: getRealisticPrice('outerwear', 'Oxxa', top3GreenMaterial, true, false),
+                price: 80, // Sabit fiyat
                 condition: currentLanguage === 'tr' ? 'İkinci El' : 'Good Condition',
                 material: top3GreenMaterial,
                 brand: 'Oxxa',
@@ -774,7 +774,7 @@ function generateClothingItems() {
                 type: clothingTypes.BRAND_NEW,
                 emoji: '👔',
                 image: 'assets/images/tops/top3yellow.png',
-                price: getRealisticPrice('outerwear', 'Miav', top3YellowMaterial, false, false),
+                price: 205, // Sabit fiyat
                 condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
                 material: top3YellowMaterial,
                 brand: 'Miav',
@@ -800,7 +800,7 @@ function generateClothingItems() {
                 type: clothingTypes.BRAND_NEW,
                 emoji: '👗',
                 image: 'assets/images/bottoms/bottom1.png',
-                price: getRealisticPrice('bottoms', 'TrendModa', bottom1Material, false, false),
+                price: 120, // Sabit fiyat
                 condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
                 material: bottom1Material,
                 brand: 'TrendModa',
@@ -816,7 +816,7 @@ function generateClothingItems() {
                 type: clothingTypes.ECO_FRIENDLY,
                 emoji: '👖',
                 image: 'assets/images/bottoms/bottom2.png',
-                price: getRealisticPrice('bottoms', 'Miav', bottom2Material, false, true),
+                price: 250, // Sabit fiyat
                 condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
                 material: bottom2Material,
                 brand: 'Miav',
@@ -847,7 +847,7 @@ function generateClothingItems() {
                 type: clothingTypes.BRAND_NEW,
                 emoji: '👖',
                 image: 'assets/images/bottoms/bottom2brown.png',
-                price: getRealisticPrice('bottoms', 'SHINE', bottom2BrownMaterial, false, false),
+                price: 135, // Sabit fiyat
                 condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
                 material: bottom2BrownMaterial,
                 brand: 'SHINE',
@@ -879,7 +879,7 @@ function generateClothingItems() {
                 type: clothingTypes.SECONDHAND,
                 emoji: '👗',
                 image: 'assets/images/bottoms/bottom1red.png',
-                price: getRealisticPrice('bottoms', 'Oxxa', bottom1RedMaterial, true, false),
+                price: 95, // Sabit fiyat
                 condition: currentLanguage === 'tr' ? 'İkinci El' : 'Good Condition',
                 material: bottom1RedMaterial,
                 brand: 'Oxxa',
@@ -895,7 +895,7 @@ function generateClothingItems() {
                 type: clothingTypes.BRAND_NEW,
                 emoji: '👗',
                 image: 'assets/images/bottoms/bottom1yellow.png',
-                price: getRealisticPrice('bottoms', 'Zera', bottom1YellowMaterial, false, false),
+                price: 275, // Sabit fiyat
                 condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
                 material: bottom1YellowMaterial,
                 brand: 'Zera',
@@ -911,7 +911,7 @@ function generateClothingItems() {
                 type: clothingTypes.SECONDHAND,
                 emoji: '👖',
                 image: 'assets/images/bottoms/bottom2_dark.png',
-                price: getRealisticPrice('bottoms', "Jollin's", bottom2DarkMaterial, true, false),
+                price: 80, // Sabit fiyat
                 condition: currentLanguage === 'tr' ? 'İkinci El' : 'Good Condition',
                 material: bottom2DarkMaterial,
                 brand: "Jollin's",
@@ -927,7 +927,7 @@ function generateClothingItems() {
                 type: clothingTypes.BRAND_NEW,
                 emoji: '👖',
                 image: 'assets/images/bottoms/bottom2black.png',
-                price: getRealisticPrice('bottoms', 'TrendModa', bottom2BlackMaterial, false, false),
+                price: 160, // Sabit fiyat
                 condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
                 material: bottom2BlackMaterial,
                 brand: 'TrendModa',
@@ -943,7 +943,7 @@ function generateClothingItems() {
                 type: clothingTypes.ECO_FRIENDLY,
                 emoji: '👖',
                 image: 'assets/images/bottoms/bottom2green.png',
-                price: getRealisticPrice('bottoms', 'Vokka', bottom2GreenMaterial, false, true),
+                price: 390, // Sabit fiyat
                 condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
                 material: bottom2GreenMaterial,
                 brand: 'Vokka',
@@ -969,7 +969,7 @@ function generateClothingItems() {
                 type: clothingTypes.BRAND_NEW,
                 emoji: '👟',
                 image: 'assets/images/shoes/shoes1.png',
-                price: getRealisticPrice('shoes', 'Dididos', shoes1Material, false, false),
+                price: 275, // Sabit fiyat
                 condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
                 material: shoes1Material,
                 brand: 'Dididos',
@@ -985,7 +985,7 @@ function generateClothingItems() {
                 type: clothingTypes.BRAND_NEW,
                 emoji: '👟',
                 image: 'assets/images/shoes/shoes1blue.png',
-                price: getRealisticPrice('shoes', 'Dididos', shoes1BlueMaterial, false, true),
+                price: 300, // Sabit fiyat
                 condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
                 material: shoes1BlueMaterial,
                 brand: 'Dididos',
@@ -1000,7 +1000,7 @@ function generateClothingItems() {
                 type: clothingTypes.BRAND_NEW,
                 emoji: '👟',
                 image: 'assets/images/shoes/shoes1green.png',
-                price: getRealisticPrice('shoes', 'Dididos', shoes1Material, false, false),
+                price: 320, // Sabit fiyat
                 condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
                 material: shoes1Material,
                 brand: 'Dididos',
@@ -1024,16 +1024,17 @@ function generateClothingItems() {
                 environmentalImpact: { water: 8450, co2: 48, energy: 35 }
             }));
 
-            // Shoes 2 Brown = NINE EAST Ayakkabı Kahverengi (%100 deri) - Pahalı marka, premium malzeme (deri)
+            // Shoes 2 Brown = NINE EAST Ayakkabı Kahverengi (suni deri) - Pahalı marka
+            const shoes2BrownMaterial = currentLanguage === 'tr' ? 'Suni Deri' : 'Synthetic Leather';
             curatedShoes.push(createRandomItem(4, {
                 id: 'shoes-2-brown',
                 name: currentLanguage === 'tr' ? 'NINE EAST Ayakkabı Kahve' : 'NINE EAST Shoes Brown',
                 type: clothingTypes.BRAND_NEW,
                 emoji: '👞',
                 image: 'assets/images/shoes/shoes2brown.png',
-                price: getRealisticPrice('shoes', 'NINE EAST', shoes2BlackMaterial, false, false),
+                price: 300, // Sabit fiyat
                 condition: currentLanguage === 'tr' ? 'Sıfır' : 'Brand New',
-                material: shoes2BlackMaterial,
+                material: shoes2BrownMaterial,
                 brand: 'NINE EAST',
                 previewTransform: { x: -102.4, y: 59, width: 405, height: 280 },
                 environmentalImpact: { water: 8450, co2: 48, energy: 35 }
