@@ -184,5 +184,6 @@ Bu proje eğitim amaçlı geliştirilmiştir.
 
 ## 👥 Katkıda Bulunanlar
 
-- Buğra Özbek
+- Buğra Özbilgin
+- Nilay Saygın
 
